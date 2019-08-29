@@ -1511,6 +1511,12 @@ class PackageBase(with_metaclass(PackageMeta, PackageViewMixin, object)):
         tests = kwargs.get('tests', False)
         dirty = kwargs.get('dirty', False)
         restage = kwargs.get('restage', False)
+        cache_path = kwargs.get('cache_path', None)
+        cache_rel = kwargs.get('cache_rel', False)
+        cache_allow_root = kwargs.get('cache_allow_root', True)
+        cache_key = kwargs.get('cache_key', None)
+        cache_no_rebuild_index = kwargs.get('cache_no_rebuild_index', False)
+        cache_force = kwargs.get('cache_force', True)
 
         # For external packages the workflow is simplified, and basically
         # consists in module file generation and registration in the DB
@@ -1660,6 +1666,12 @@ class PackageBase(with_metaclass(PackageMeta, PackageViewMixin, object)):
                     (_hms(self._fetch_time), _hms(build_time),
                      _hms(self._total_time)))
             print_pkg(self.prefix)
+
+            if cache_path is not None:
+                tty.msg("Creating binary cache of {0} at {1}".format(self.name, cache_path))
+                binary_distribution.build_tarball(self.spec, cache_path, cache_force, cache_rel,
+                    True if cache_key is None else False, cache_allow_root, cache_key, not cache_no_rebuild_index)
+
 
             # preserve verbosity across runs
             return echo

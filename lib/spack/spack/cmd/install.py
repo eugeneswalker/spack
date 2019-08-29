@@ -20,6 +20,7 @@ import spack.paths
 import spack.report
 from spack.error import SpackError
 
+from csv import reader as csvreader
 
 description = "build and install packages"
 section = "build"
@@ -30,7 +31,35 @@ def update_kwargs_from_args(args, kwargs):
     """Parse cli arguments and construct a dictionary
     that will be passed to Package.do_install API"""
 
+    copts = {
+        "force":True,
+        "allow_root":True,
+        "path":None,
+        "key":None,
+        "no_rebuild_index":False,
+        "rel":False}
+
+    if args.cacheout is not None:
+        cos = list(csvreader([args.cacheout]))[0]
+        for co in cos:
+            o = co.split('=',1)
+            if o[0] not in copts:
+                tty.die("invalid option in argument --cache '{0}'".format(o[0]))
+
+            if len(o) == 1:
+                if type(copts[o[0]]) != bool:
+                    tty.die("option to --cache is not bool, expects value '{0}'".format(o[0]))
+                copts[o[0]] = True
+            else:
+                copts[o[0]] = o[1]
+
     kwargs.update({
+        'cache_path': copts['path'],
+        'cache_key': copts['key'],
+        'cache_force': copts['force'],
+        'cache_rel': copts['rel'],
+        'cache_allow_root': copts['allow_root'],
+        'cache_no_rebuild_index': copts['no_rebuild_index'],
         'keep_prefix': args.keep_prefix,
         'keep_stage': args.keep_stage,
         'restage': not args.dont_restage,
@@ -167,6 +196,11 @@ buildstamp which, when combined with build name, site and project,
 uniquely identifies the build, provide this argument to identify
 the build yourself.  Format: %%Y%%m%%d-%%H%%M-[cdash-track]"""
     )
+    subparser.add_argument(
+        "--cacheout",
+        default=None,
+        metavar="caching_options",
+        help="""path=<cache-path>[,force][,rel][,allow_root][,key=<signing-key-name>][,no_rebuild]""")
     arguments.add_common_arguments(subparser, ['yes_to_all'])
 
 
