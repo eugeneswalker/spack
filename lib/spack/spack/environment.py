@@ -146,12 +146,15 @@ def activate(
         cmds += 'export SPACK_ENV=%s;\n' % env.path
         cmds += "alias despacktivate='spack env deactivate';\n"
         if prompt:
-            cmds += 'if [ -z "${SPACK_OLD_PS1}" ]; then\n'
+            cmds += 'if [ -z "${SPACK_OLD_PS1+x}" ]; then\n'
+            cmds += '    if [ -z "${PS1+x}" ]; then\n'
+            cmds += "        PS1=' > ';\n"
+            cmds += '    fi;\n'
             cmds += '    export SPACK_OLD_PS1="${PS1}";\n'
             cmds += 'else\n'
             cmds += '    export PS1="${SPACK_OLD_PS1}";\n'
             cmds += 'fi;\n'
-            cmds += 'export PS1="{0} $PS1";\n'.format(prompt)
+            cmds += ' export PS1="{0} $PS1";\n'.format(prompt)
 
     if add_view and default_view_name in env.views:
         cmds += env.add_default_view_to_shell(shell)
