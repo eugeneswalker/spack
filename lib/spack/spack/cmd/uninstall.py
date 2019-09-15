@@ -57,6 +57,11 @@ def setup_parser(subparser):
         "will be uninstalled.")
 
     subparser.add_argument(
+        '--file', action='append', default=[],
+        dest='specfiles', metavar='SPEC_YAML_FILE',
+        help="uninstall from file. Read specs to uninstall from .yaml files")
+
+    subparser.add_argument(
         'packages',
         nargs=argparse.REMAINDER,
         help="specs of packages to uninstall")
@@ -336,10 +341,22 @@ def uninstall_specs(args, specs):
 
 
 def uninstall(parser, args):
-    if not args.packages and not args.all:
+    if not args.packages and not args.all and len(args.specfiles)<=0:
         tty.die('uninstall requires at least one package argument.',
                 '  Use `spack uninstall --all` to uninstall ALL packages.')
 
     # [any] here handles the --all case by forcing all specs to be returned
-    specs = spack.cmd.parse_specs(args.packages) if args.packages else [any]
+    specs = []
+    if len(args.specfiles) > 0:
+      for file in args.specfiles:
+        with open(file, 'r') as f:
+          s = spack.spec.Spec.from_yaml(f)
+          if s.concretized().dag_hash() != s.dag_hash():
+            msg = 'skipped invalid file "{0}". '
+            msg += 'The file does not contain a concrete spec.'
+            tty.warn(msg.format(file))
+            continue
+          specs.append(s)
+    else:
+      specs = spack.cmd.parse_specs(args.packages) if args.packages else [any]
     uninstall_specs(args, specs)
