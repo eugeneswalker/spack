@@ -318,9 +318,9 @@ def install(parser, args, **kwargs):
                 )
                 if not answer:
                     tty.die('Reinstallation aborted.')
-
+            installed_dag_hashes = [s.dag_hash() for s in installed]
             for abstract, concrete in zip(abstract_specs, specs):
-                if concrete in installed:
+                if concrete in installed or concrete.dag_hash() in installed_dag_hashes:
                     with fs.replace_directory_transaction(concrete.prefix):
                         install_spec(args, kwargs, abstract, concrete)
                 else:
