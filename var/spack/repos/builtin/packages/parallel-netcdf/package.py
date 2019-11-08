@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: (Apache-2.0 OR MIT)
 
 from spack import *
-
+import os
 
 class ParallelNetcdf(AutotoolsPackage):
     """PnetCDF (Parallel netCDF) is a high-performance parallel I/O
@@ -50,13 +50,14 @@ class ParallelNetcdf(AutotoolsPackage):
     # https://trac.mcs.anl.gov/projects/parallel-netcdf/browser/trunk/INSTALL
     def configure_args(self):
         spec = self.spec
-
+        link_dir = spack.paths.build_env_path
+        scc = os.path.join(link_dir, self.compiler.link_paths['cc'])
         args = ['--with-mpi={0}'.format(spec['mpi'].prefix)]
         args.append('MPICC={0}'.format(spec['mpi'].mpicc))
         args.append('MPICXX={0}'.format(spec['mpi'].mpicxx))
         args.append('MPIF77={0}'.format(spec['mpi'].mpifc))
         args.append('MPIF90={0}'.format(spec['mpi'].mpifc))
-        args.append('SEQ_CC={0}'.format(spack_cc))
+        args.append('SEQ_CC={0}'.format(scc))
 
         if '+pic' in spec:
             args.extend([
