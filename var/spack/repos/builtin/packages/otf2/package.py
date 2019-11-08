@@ -5,7 +5,7 @@
 
 
 from spack import *
-
+import os
 
 class Otf2(AutotoolsPackage):
     """The Open Trace Format 2 is a highly scalable, memory efficient event
@@ -25,12 +25,17 @@ class Otf2(AutotoolsPackage):
     version('1.2.1', sha256='1db9fb0789de4a9c3c96042495e4212a22cb581f734a1593813adaf84f2288e4')
 
     def configure_args(self):
+        link_dir = spack.paths.build_env_path
+        scc = os.path.join(link_dir, self.compiler.link_paths['cc'])
+        scxx = os.path.join(link_dir, self.compiler.link_paths['cxx'])
+        sf77 = os.path.join(link_dir, self.compiler.link_paths['f77'])
+        sfc = os.path.join(link_dir, self.compiler.link_paths['fc'])
         return [
             '--enable-shared',
-            'CC={0}'.format(spack_cc),
-            'CXX={0}'.format(spack_cxx),
-            'F77={0}'.format(spack_f77),
-            'FC={0}'.format(spack_fc),
+            'CC={0}'.format(scc),
+            'CXX={0}'.format(scxx),
+            'F77={0}'.format(sf77),
+            'FC={0}'.format(sfc),
             'CFLAGS={0}'.format(self.compiler.pic_flag),
             'CXXFLAGS={0}'.format(self.compiler.pic_flag)
         ]
