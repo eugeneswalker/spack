@@ -99,7 +99,7 @@ class Mpifileutils(Package):
     def configure_args(self):
         args = []
         args.append('--prefix=%s' % self.spec.prefix)
-        args.append("CPPFLAGS=-I%s/src/common" % pwd())
+        args.append("CPPFLAGS=-I%s/src/common" % self.stage.source_path)
         args.append("libarchive_CFLAGS=-I%s"
                     % self.spec['libarchive'].prefix.include)
         args.append("libarchive_LIBS=%s %s"
