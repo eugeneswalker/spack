@@ -322,7 +322,7 @@ def build_tarball(spec, outdir, force=False, rel=False, unsigned=False,
         outdir, os.path.relpath(spackfile_path, tmpdir))
 
     mkdirp(tarfile_dir)
-    if web_util.url_exists(remote_spackfile_path):
+    if web_util.url_exists(remote_spackfile_path) and False:
         if force:
             web_util.remove_url(remote_spackfile_path)
         else:
@@ -339,7 +339,7 @@ def build_tarball(spec, outdir, force=False, rel=False, unsigned=False,
     remote_specfile_path = url_util.join(
         outdir, os.path.relpath(specfile_path, os.path.realpath(tmpdir)))
 
-    if web_util.url_exists(remote_specfile_path):
+    if web_util.url_exists(remote_specfile_path) and False:
         if force:
             web_util.remove_url(remote_specfile_path)
         else:
