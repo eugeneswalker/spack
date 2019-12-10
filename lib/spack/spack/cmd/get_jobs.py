@@ -229,9 +229,9 @@ def get_jobs(parser, args, **kwargs):
             "spack mirror add s3 ${S3_MIRROR}"
           ],
           "script": [
-            "time spack install --cache-only --only dependencies ./specs/${SPEC_YAML_FILE}",
-            "time spack install --no-cache --only package ./specs/${SPEC_YAML_FILE}",
-            "spack buildcache create -d s3 -afr --key ${SIGNING_KEY_ID} --no-deps -y ./specs/${SPEC_YAML_FILE}"
+            "time spack -d install --cache-only --only dependencies ./specs/${SPEC_YAML_FILE}",
+            "time spack -d install --no-cache --only package ./specs/${SPEC_YAML_FILE}",
+            "spack -d buildcache create -d s3 -afr --key ${SIGNING_KEY_ID} --no-deps -y ./specs/${SPEC_YAML_FILE}"
           ],
           "tags": list(runner_tags),
         }
