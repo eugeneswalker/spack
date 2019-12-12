@@ -80,6 +80,7 @@ def get_jobs(parser, args, **kwargs):
 
   blr = ["build", "link", "run"]
 
+  chosen_oss = ""
   e = env.get_env(None, 'get_jobs', required=True)
   e.concretize()
   css = [cs for (us,cs) in e.concretized_specs()]
@@ -92,6 +93,10 @@ def get_jobs(parser, args, **kwargs):
           s.spec._build_hash = None
           s.spec._hash = None
           s.spec.architecture = spack.spec.ArchSpec(("linux",oss,"x86_64"))
+    else:
+      for s in css[0].traverse_edges(deptype=blr, direction="children", cover="nodes", order="pre"):
+        chosen_oss = s.spec.architecture.os
+        break
 
     for cs in css:
       for s in cs.traverse_edges(deptype=blr, direction="children", cover="nodes", order="pre"):
@@ -251,7 +256,7 @@ def get_jobs(parser, args, **kwargs):
 
     # write .gitlab-ci.yml
     y["stages"] = stages
-    ci_file = ".gitlab-ci.yml.{}".format(oss) if oss != '' else ".gitlab-ci.yml"
+    ci_file = ".gitlab-ci.yml.{}".format(oss) if oss != '' else ".gitlab-ci.yml.{}".format(chosen_oss)
     with open(ci_file,"w") as ymlfile:
       yaml.dump(y, ymlfile, default_flow_style=False)
     
@@ -259,6 +264,8 @@ def get_jobs(parser, args, **kwargs):
     specs_dir = os.path.abspath(args.specs_dir)
     if oss != '':
       specs_dir += "-{}".format(oss)
+    else:
+      specs_dir += "-{}".format(chosen_oss)
     os.makedirs(specs_dir, exist_ok=True)
     ss = list(chain.from_iterable(spec_stages))
     for h in ss:
