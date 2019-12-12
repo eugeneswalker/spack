@@ -42,6 +42,12 @@ def setup_parser(subparser):
     default="",
     required=False,
     help="""Comma-separated list of operating systems to build for""")
+  subparser.add_argument(
+    '--arch',
+    dest='arch',
+    default="x86_64",
+    required=False,
+    help="""Target architecture""")
 
 description = "generate a build manifest containing each spack job needed to install an environment"
 section = "build"
@@ -57,8 +63,8 @@ def get_jobs(parser, args, **kwargs):
 
   os_to_runner_map = {
     "ubuntu18.04": "ecpe4s/ubuntu18.04-spack-runner-x86-64:0.13.2",
-    "centos7": "ecpe4s/centos7-spack-runner",
-    "rhel7": "ecpe4s/ubi7-spack-runner"
+    "centos7": "ecpe4s/centos7-spack-runner-x86-64:0.13.2",
+    "rhel7": "ecpe4s/ubi7-spack-runner-x86-64:0.13.2"
   }
 
   valid_osss = set(list(os_to_runner_map.keys())+[''])
