@@ -64,7 +64,9 @@ def get_jobs(parser, args, **kwargs):
   os_to_runner_map = {
     "ubuntu18.04": "ecpe4s/ubuntu18.04-spack-runner-x86-64:0.13.2",
     "centos7": "ecpe4s/centos7-spack-runner-x86-64:0.13.2",
-    "rhel7": "ecpe4s/ubi7-spack-runner-x86-64:0.13.2"
+    "centos8": "ecpe4s/centos8-spack-runner-x86-64:0.13.2",
+    "rhel7": "ecpe4s/ubi7-spack-runner-x86-64:0.13.2",
+    "rhel8": "ecpe4s/ubi8-spack-runner-x86-64:0.13.2"
   }
 
   valid_osss = set(list(os_to_runner_map.keys())+[''])
@@ -75,7 +77,7 @@ def get_jobs(parser, args, **kwargs):
     pass
 
   if not set(osss).issubset(valid_osss):
-    sys.stderr.write("Multiple operating system list must be comma separated and confined to centos7, rhel7, and/or ubuntu18.04\n")
+    sys.stderr.write("Multiple operating system list must be comma separated and confined to centos7/8, rhel7/8, and/or ubuntu18.04\n")
     return 1
 
   blr = ["build", "link", "run"]
