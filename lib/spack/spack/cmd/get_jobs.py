@@ -13,6 +13,13 @@ import traceback
 
 def setup_parser(subparser):
   subparser.add_argument(
+    '--no-needs',
+    dest='disable_needs',
+    action='store_true',
+    default=False,
+    required=False,
+    help="""where to write job specs yaml files to""")
+  subparser.add_argument(
     '--specs-dir',
     dest='specs_dir',
     default="./specs",
@@ -253,7 +260,7 @@ def get_jobs(parser, args, **kwargs):
             "name": os_to_runner_map[oss],
             "entrypoint": ['']
           }
-        if len(needs) > 0:
+        if len(needs) > 0 and not args.disable_needs:
           y[job]["needs"] = needs
 
     # write .gitlab-ci.yml
