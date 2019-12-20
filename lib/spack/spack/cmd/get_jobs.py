@@ -69,11 +69,11 @@ def get_jobs(parser, args, **kwargs):
     return 1
 
   os_to_runner_map = {
-    "ubuntu18.04": "ecpe4s/ubuntu18.04-spack-runner-x86-64:0.13.2",
-    "centos7": "ecpe4s/centos7-spack-runner-x86-64:0.13.2",
-    "centos8": "ecpe4s/centos8-spack-runner-x86-64:0.13.2",
-    "rhel7": "ecpe4s/ubi7-spack-runner-x86-64:0.13.2",
-    "rhel8": "ecpe4s/ubi8-spack-runner-x86-64:0.13.2"
+    "ubuntu18.04": "ecpe4s/ubuntu18.04-runner:0.13.2",
+    "centos7": "ecpe4s/centos7-runner:0.13.2",
+    "centos8": "ecpe4s/centos8-runner:0.13.2",
+    "rhel7": "ecpe4s/ubi7-runner:0.13.2",
+    "rhel8": "ecpe4s/ubi8-runner:0.13.2"
   }
 
   valid_osss = set(list(os_to_runner_map.keys())+[''])
@@ -255,11 +255,10 @@ def get_jobs(parser, args, **kwargs):
           ],
           "tags": list(runner_tags),
         }
-        if oss != '':
-          y[job]["image"] = {
-            "name": os_to_runner_map[oss],
-            "entrypoint": ['']
-          }
+        y[job]["image"] = {
+          "name": os_to_runner_map[oss if oss != '' else chosen_oss],
+          "entrypoint": ['']
+        }
         if len(needs) > 0 and not args.disable_needs:
           y[job]["needs"] = needs
 
