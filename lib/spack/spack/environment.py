@@ -992,13 +992,11 @@ class Environment(object):
         spec = Spec(user_spec)
 
         if self.add(spec):
-            tty.debug('environment.install() spec {0} added'.format(spec))
             concrete = concrete_spec if concrete_spec else spec.concretized()
             self._add_concrete_spec(spec, concrete)
         else:
             # spec might be in the user_specs, but not installed.
             # TODO: Redo name-based comparison for old style envs
-            tty.debug('environment.install() user_spec: {0}'.format(user_spec))
             spec = next(s for s in self.user_specs if s.satisfies(user_spec))
             concrete = self.specs_by_hash.get(spec.build_hash())
             if not concrete:
