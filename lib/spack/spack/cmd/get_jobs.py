@@ -245,7 +245,8 @@ def get_jobs(parser, args, **kwargs):
             "popd",
             ". \"${SPACK_CLONE_DIR}/spack/share/spack/setup-env.sh\"",
             "echo \"${SIGNING_KEY}\" > key.priv",
-            "spack gpg trust key.priv"
+            "spack gpg trust key.priv",
+            "spack mirror add s3 ${S3_MIRROR}"
           ],
           "script": [
             "time spack -d install --cache-only --only dependencies ./specs/${SPEC_YAML_FILE}",
