@@ -225,7 +225,7 @@ def get_jobs(parser, args, **kwargs):
     yaml.dump(y, ymlfile, default_flow_style=False)
   
   # write .spec.yaml files
-  specs_dir = os.path.abspath("./specs-{}-{}".format(target_os, target_arch))
+  specs_dir = os.path.abspath("./specs-{}".format(os_arch_tag))
   os.makedirs(specs_dir, exist_ok=True)
 
   ss = list(chain.from_iterable(spec_stages))
