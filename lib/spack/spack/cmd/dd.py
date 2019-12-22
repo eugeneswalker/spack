@@ -11,58 +11,18 @@ import copy
 from itertools import chain
 import traceback
 
-def setup_parser(subparser):
+def setup_parser(subparser): 
   subparser.add_argument(
-    '--no-needs',
-    dest='disable_needs',
-    action='store_true',
-    default=False,
-    required=False,
-    help="""where to write job specs yaml files to""") 
-  subparser.add_argument(
-    '--tags',
-    dest='tags',
+    '--mirror',
+    dest='mirror_path',
     required=True,
-    type=str,
-    help="""CI runner tags""")
-  subparser.add_argument(
-    '--s3',
-    dest='s3',
-    required=True,
-    help="""S3 mirror path""") 
+    help="""mirror path""") 
 
-description = "generate a build manifest containing each spack job needed to install an environment"
+description = "generate dependency and dependent information for all specs in an environment"
 section = "build"
 level = "short"
 
-def get_jobs(parser, args, **kwargs):
-  tags = []
-  try:
-    tags = args.tags.split(',')
-  except:
-    sys.stderr.write("Runner tags must be comma separated. Failed to process: {}\n".format(args.tags))
-    return 1
-
-  if 'TARGET_OS' not in os.environ or 'TARGET_ARCH' not in os.environ:
-    sys.stderr.write("Required environment variables are missing: TARGET_OS, TARGET_ARCH\n")
-    return 1
-
-  target_os = os.environ["TARGET_OS"]
-  target_arch = os.environ["TARGET_ARCH"]
-  os_arch_tag = "{}-{}".format(target_os, target_arch)
-
-  os_to_runner_map = {
-    "ubuntu18.04": "ecpe4s/ubuntu18.04-runner:0.13.2",
-    "centos7": "ecpe4s/centos7-runner:0.13.2",
-    "centos8": "ecpe4s/centos8-runner:0.13.2",
-    "rhel7": "ecpe4s/rhel7-runner:0.13.2",
-    "rhel8": "ecpe4s/rhel8-runner:0.13.2"
-  }
-
-  if target_os not in os_to_runner_map:
-    sys.stderr.write("Error: no entry in os_to_runner_map for TARGET_OS='{}'\n".format(target_os))
-    return 1
-
+def dd(parser, args, **kwargs):
   blr = ["build", "link", "run"]
 
   e = env.get_env(None, 'get_jobs', required=True)
@@ -110,8 +70,7 @@ def get_jobs(parser, args, **kwargs):
       assert all_specs[dh]["dependent_hashes"].count(h) == 1
 
   # determine which specs are up-to-date at binary build cache
-
-  mirror_url = args.s3
+  mirror_url = args.mirror_path
   spec_hashes = list(all_specs.keys())
   spec_hashes_rebuild = []
   tty._msg_enabled = False
@@ -187,51 +146,20 @@ def get_jobs(parser, args, **kwargs):
     spec_hashes_rebuild.sort(key=ndeps)
     this_stage = []
 
-  # generate .gitlab-ci.yml
-  y = {}
-  stages = []
+
   for ii, hs in enumerate(spec_stages):
-    stage = "s{}".format(str(ii).zfill(2))
-    stages.append(stage)
-    for h in hs:
-      job = job_name(all_specs[h]["spec"])
-      y[job] = {
-        "stage": stage,
-        "variables": {
-          "SPEC_YAML_FILE": "./specs/{}.yaml".format(job)
-        },
-        "script": [
-          "./do-ci-job.sh ${SPEC_YAML_FILE}"
-        ],
-        "tags": list(tags),
-      }
-
-      # docker image
-      y[job]["image"] = {
-        "name": os_to_runner_map[target_os],
-        "entrypoint": ['']
-      }
-
-      # dag scheduling
-      needs = [job_name(all_specs[dh]["spec"]) for dh in all_specs[h]["dependency_hashes"]]
-      if len(needs) > 0 and not args.disable_needs:
-        y[job]["needs"] = needs
-
-  # write .gitlab-ci.yml
-  y["stages"] = stages
-
-  ci_file = ".gitlab-ci.yml.{}".format(os_arch_tag)
-  with open(ci_file,"w") as ymlfile:
-    yaml.dump(y, ymlfile, default_flow_style=False)
-  
+    # ii = stage num
+    # hs = spec hashes in stage
+    continue
+ 
   # write .spec.yaml files
-  specs_dir = os.path.abspath("./specs-{}".format(os_arch_tag))
-  os.makedirs(specs_dir, exist_ok=True)
+  specdir = os.path.abspath("./specs")
+  os.makedirs(specdir, exist_ok=True)
 
   ss = list(chain.from_iterable(spec_stages))
   for h in ss:
     s = all_specs[h]["spec"]
     spec_yaml = s.to_yaml(hash=ht.build_hash) 
-    spec_yaml_path = os.path.join(specs_dir, "{}.yaml".format(job_name(s)))
+    spec_yaml_path = os.path.join(specdir, "{}.yaml".format(job_name(s)))
     with open(spec_yaml_path, 'w') as fs:
       fs.write(spec_yaml)
