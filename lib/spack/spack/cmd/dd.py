@@ -10,12 +10,13 @@ import os
 import copy
 from itertools import chain
 import traceback
+import json
 
 def setup_parser(subparser): 
   subparser.add_argument(
     '--mirror',
     dest='mirror_path',
-    required=True,
+    required=False,
     help="""mirror path""") 
 
 description = "generate dependency and dependent information for all specs in an environment"
@@ -68,6 +69,16 @@ def dd(parser, args, **kwargs):
       assert all_specs[dh]["dependency_hashes"].count(h) == 1
     for dh in o["dependency_hashes"]:
       assert all_specs[dh]["dependent_hashes"].count(h) == 1
+
+
+  ask=list(all_specs.keys())
+  k = ask[0]
+  d=all_specs[k]
+  print(k)
+  print(d["spec"].name)
+  print(json.dumps(d["dependent_hashes"], indent=1))
+  print(json.dumps(d["dependency_hashes"], indent=1))
+  return 0 
 
   # determine which specs are up-to-date at binary build cache
   mirror_url = args.mirror_path
