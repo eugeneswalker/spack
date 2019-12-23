@@ -73,6 +73,9 @@ def dd(parser, args, **kwargs):
 
   ask=list(all_specs.keys())
   k = ask[0]
+  for k in ask:
+    if len(all_specs[k]["dependent_hashes"]) > 0 and len(all_specs[k]["dependency_hashes"]) > 0:
+      break
   d=all_specs[k]
   print(k)
   print(d["spec"].name)
