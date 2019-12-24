@@ -201,7 +201,7 @@ def get_jobs(parser, args, **kwargs):
           "SPEC_YAML_FILE": "./specs/{}.yaml".format(job)
         },
         "script": [
-          "./do-ci-job.sh ${SPEC_YAML_FILE}"
+          "./run-ci-job.sh ${SPEC_YAML_FILE}"
         ],
         "tags": list(tags),
       }
