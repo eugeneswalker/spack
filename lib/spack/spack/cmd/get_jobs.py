@@ -53,7 +53,7 @@ def get_jobs(parser, args, **kwargs):
 
   os_to_runner_map = {
     "ubuntu18.04": "ecpe4s/ubuntu18.04-runner:0.13.2",
-    "centos7": "ecpe4s/centos7-runner:0.13.2",
+    "centos7": "ecpe4s/centos7-runner:0.13.3",
     "centos8": "ecpe4s/centos8-runner:0.13.2",
     "rhel7": "ecpe4s/rhel7-runner:0.13.2",
     "rhel8": "ecpe4s/rhel8-runner:0.13.2"
