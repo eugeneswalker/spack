@@ -198,6 +198,8 @@ def get_jobs(parser, args, **kwargs):
       y[job] = {
         "stage": stage,
         "variables": {
+          "TARGET_ARCH": target_arch,
+          "TARGET_OS": target_os,
           "SPEC_YAML_FILE": "./specs/{}.yaml".format(job)
         },
         "script": [
