@@ -52,11 +52,11 @@ def get_jobs(parser, args, **kwargs):
   os_arch_tag = "{}-{}".format(target_os, target_arch)
 
   os_to_runner_map = {
-    "ubuntu18.04": "ecpe4s/ubuntu18.04-runner:0.13.2",
+    "ubuntu18.04": "ecpe4s/ubuntu18.04-runner:0.13.3",
     "centos7": "ecpe4s/centos7-runner:0.13.3",
-    "centos8": "ecpe4s/centos8-runner:0.13.2",
-    "rhel7": "ecpe4s/rhel7-runner:0.13.2",
-    "rhel8": "ecpe4s/rhel8-runner:0.13.2"
+    "centos8": "ecpe4s/centos8-runner:0.13.3",
+    "rhel7": "ecpe4s/rhel7-runner:0.13.3",
+    "rhel8": "ecpe4s/rhel8-runner:0.13.3"
   }
 
   if target_os not in os_to_runner_map:
