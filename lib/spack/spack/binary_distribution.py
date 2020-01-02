@@ -322,11 +322,11 @@ def build_tarball(spec, outdir, force=False, rel=False, unsigned=False,
         outdir, os.path.relpath(spackfile_path, tmpdir))
 
     mkdirp(tarfile_dir)
-    if web_util.url_exists(remote_spackfile_path):
-        if force:
-            web_util.remove_url(remote_spackfile_path)
-        else:
-            raise NoOverwriteException(url_util.format(remote_spackfile_path))
+#    if web_util.url_exists(remote_spackfile_path):
+#        if force:
+#            web_util.remove_url(remote_spackfile_path)
+#        else:
+#            raise NoOverwriteException(url_util.format(remote_spackfile_path))
 
     # need to copy the spec file so the build cache can be downloaded
     # without concretizing with the current spack packages
@@ -339,11 +339,11 @@ def build_tarball(spec, outdir, force=False, rel=False, unsigned=False,
     remote_specfile_path = url_util.join(
         outdir, os.path.relpath(specfile_path, os.path.realpath(tmpdir)))
 
-    if web_util.url_exists(remote_specfile_path):
-        if force:
-            web_util.remove_url(remote_specfile_path)
-        else:
-            raise NoOverwriteException(url_util.format(remote_specfile_path))
+#    if web_util.url_exists(remote_specfile_path):
+#        if force:
+#            web_util.remove_url(remote_specfile_path)
+#        else:
+#            raise NoOverwriteException(url_util.format(remote_specfile_path))
 
     # make a copy of the install directory to work with
     workdir = os.path.join(tempfile.mkdtemp(), os.path.basename(spec.prefix))
