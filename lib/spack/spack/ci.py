@@ -604,6 +604,7 @@ def generate_gitlab_ci_yaml(env, print_summary, output_file,
                 }
 
                 job_dependencies = []
+                job_needs = []
                 if spec_label in dependencies:
                     for dep_label in dependencies[spec_label]:
                         dep_pkg = pkg_name_from_spec_label(dep_label)
@@ -612,6 +613,7 @@ def generate_gitlab_ci_yaml(env, print_summary, output_file,
                             phase_name, strip_compilers, dep_spec, osname,
                             build_group)
                         job_dependencies.append(dep_job_name)
+                        job_needs.append(dep_job_name)
 
                 # This next section helps gitlab make sure the right
                 # bootstrapped compiler exists in the artifacts buildcache by
@@ -633,6 +635,7 @@ def generate_gitlab_ci_yaml(env, print_summary, output_file,
                                                       str(bs_arch),
                                                       build_group)
                             job_dependencies.append(c_job_name)
+                            job_needs.append(c_job_name)
 
                 if enable_cdash_reporting:
                     cdash_build_name = get_cdash_build_name(
@@ -668,8 +671,10 @@ def generate_gitlab_ci_yaml(env, print_summary, output_file,
                         'paths': artifact_paths,
                         'when': 'always',
                     },
-                    'dependencies': job_dependencies,
+                    #'dependencies': job_dependencies,
                 }
+                if len(job_needs) > 0:
+                  job_object['needs'] = job_needs
 
                 if before_script:
                     job_object['before_script'] = before_script
