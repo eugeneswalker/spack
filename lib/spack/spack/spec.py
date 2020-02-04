@@ -369,6 +369,10 @@ class ArchSpec(object):
         if not need_to_check:
             return True
 
+        if not self_target:
+            print('^^^^^^ GAH! self_target is None, self = {0}'.format(self))
+            return False
+
         for target_range in str(other_target).split(','):
             t_min, sep, t_max = target_range.partition(':')
 
