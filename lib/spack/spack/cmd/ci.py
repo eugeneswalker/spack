@@ -63,6 +63,9 @@ def setup_parser(subparser):
     start.add_argument(
         '--commit-sha', default='none',
         help="SHA of current commit, used in generation of pushed commit.")
+    start.add_argument(
+        '--use-needs', default=False, action='store_true',
+        help="WIP: use GitLab DAG scheduling via `needs` instead of `depends`")
     start.set_defaults(func=ci_start)
 
     # Dynamic generation of the jobs yaml from a spack environment
@@ -85,6 +88,9 @@ def setup_parser(subparser):
         help="Provide a git branch or tag if a custom spack branch " +
              "should be checked out as a step in each generated job.  " +
              "This argument is ignored if no --spack-repo is provided.")
+    generate.add_argument(
+        '--use-needs', default=False, action='store_true',
+        help="WIP: use GitLab DAG scheduling via `needs` instead of `depends`")
     generate.set_defaults(func=ci_generate)
 
     # Commit and push jobs yaml to a downstream CI repo
@@ -131,7 +137,7 @@ def ci_generate(args):
 
     # Generate the jobs
     spack_ci.generate_gitlab_ci_yaml(
-        env, True, output_file, spack_repo, spack_ref)
+        env, True, output_file, spack_repo, spack_ref, use_needs=args.use_needs)
 
     if copy_yaml_to:
         copy_to_dir = os.path.dirname(copy_yaml_to)

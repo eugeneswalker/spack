@@ -432,7 +432,7 @@ def pkg_name_from_spec_label(spec_label):
 
 
 def generate_gitlab_ci_yaml(env, print_summary, output_file,
-                            custom_spack_repo=None, custom_spack_ref=None):
+                            custom_spack_repo=None, custom_spack_ref=None, use_needs=False):
     # FIXME: What's the difference between one that opens with 'spack'
     # and one that opens with 'env'?  This will only handle the former.
     with spack.concretize.disable_compiler_existence_check():
@@ -668,8 +668,12 @@ def generate_gitlab_ci_yaml(env, print_summary, output_file,
                         'paths': artifact_paths,
                         'when': 'always',
                     },
-                    'dependencies': job_dependencies,
                 }
+                if use_needs:
+                    if len(job_dependencies) > 0:
+                        job_object['needs'] = job_dependencies
+                else:
+                    job_object['dependencies'] = job_dependencies
 
                 if before_script:
                     job_object['before_script'] = before_script
