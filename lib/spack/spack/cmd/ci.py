@@ -319,159 +319,154 @@ def ci_rebuild(args):
 
     job_spec_yaml_path = os.path.join(
         spec_dir, '{0}.yaml'.format(job_spec_pkg_name))
-    job_log_file = os.path.join(job_log_dir, 'pipeline_log.txt')
 
     cdash_build_id = None
     cdash_build_stamp = None
 
-    with open(job_log_file, 'w') as log_fd:
-        os.dup2(log_fd.fileno(), sys.stdout.fileno())
-        os.dup2(log_fd.fileno(), sys.stderr.fileno())
+    current_directory = os.getcwd()
+    tty.debug('Current working directory: {0}, Contents:'.format(
+        current_directory))
+    directory_list = os.listdir(current_directory)
+    for next_entry in directory_list:
+        tty.debug('  {0}'.format(next_entry))
 
-        current_directory = os.getcwd()
-        tty.debug('Current working directory: {0}, Contents:'.format(
-            current_directory))
-        directory_list = os.listdir(current_directory)
-        for next_entry in directory_list:
-            tty.debug('  {0}'.format(next_entry))
+    # Make a copy of the environment file, so we can overwrite the changed
+    # version in between the two invocations of "spack install"
+    env_src_path = os.path.join(current_directory, 'spack.yaml')
+    env_dst_path = os.path.join(current_directory, 'spack.yaml_BACKUP')
+    shutil.copyfile(env_src_path, env_dst_path)
 
-        # Make a copy of the environment file, so we can overwrite the changed
-        # version in between the two invocations of "spack install"
-        env_src_path = os.path.join(current_directory, 'spack.yaml')
-        env_dst_path = os.path.join(current_directory, 'spack.yaml_BACKUP')
-        shutil.copyfile(env_src_path, env_dst_path)
+    tty.debug('job concrete spec path: {0}'.format(job_spec_yaml_path))
 
-        tty.debug('job concrete spec path: {0}'.format(job_spec_yaml_path))
+    if signing_key:
+        spack_ci.import_signing_key(signing_key)
 
-        if signing_key:
-            spack_ci.import_signing_key(signing_key)
+    spack_ci.configure_compilers(compiler_action)
 
-        spack_ci.configure_compilers(compiler_action)
+    spec_map = spack_ci.get_concrete_specs(
+        root_spec, job_spec_pkg_name, related_builds, compiler_action)
 
-        spec_map = spack_ci.get_concrete_specs(
-            root_spec, job_spec_pkg_name, related_builds, compiler_action)
+    job_spec = spec_map[job_spec_pkg_name]
 
-        job_spec = spec_map[job_spec_pkg_name]
+    tty.debug('Here is the concrete spec: {0}'.format(job_spec))
 
-        tty.debug('Here is the concrete spec: {0}'.format(job_spec))
+    with open(job_spec_yaml_path, 'w') as fd:
+        fd.write(job_spec.to_yaml(hash=ht.build_hash))
 
-        with open(job_spec_yaml_path, 'w') as fd:
-            fd.write(job_spec.to_yaml(hash=ht.build_hash))
+    tty.debug('Done writing concrete spec')
 
-        tty.debug('Done writing concrete spec')
+    # DEBUG
+    with open(job_spec_yaml_path) as fd:
+        tty.debug('Wrote spec file, read it back.  Contents:')
+        tty.debug(fd.read())
 
-        # DEBUG
-        with open(job_spec_yaml_path) as fd:
-            tty.debug('Wrote spec file, read it back.  Contents:')
-            tty.debug(fd.read())
+    # DEBUG the root spec
+    root_spec_yaml_path = os.path.join(spec_dir, 'root.yaml')
+    with open(root_spec_yaml_path, 'w') as fd:
+        fd.write(spec_map['root'].to_yaml(hash=ht.build_hash))
 
-        # DEBUG the root spec
-        root_spec_yaml_path = os.path.join(spec_dir, 'root.yaml')
-        with open(root_spec_yaml_path, 'w') as fd:
-            fd.write(spec_map['root'].to_yaml(hash=ht.build_hash))
+    if bindist.needs_rebuild(job_spec, remote_mirror_url, True):
+        # Binary on remote mirror is not up to date, we need to rebuild
+        # it.
+        #
+        # FIXME: ensure mirror precedence causes this local mirror to
+        # be chosen ahead of the remote one when installing deps
+        if enable_artifacts_mirror:
+            mirror_add_output = spack_cmd(
+                'mirror', 'add', 'local_mirror', artifact_mirror_url)
+            tty.debug('spack mirror add:')
+            tty.debug(mirror_add_output)
 
-        if bindist.needs_rebuild(job_spec, remote_mirror_url, True):
-            # Binary on remote mirror is not up to date, we need to rebuild
-            # it.
-            #
-            # FIXME: ensure mirror precedence causes this local mirror to
-            # be chosen ahead of the remote one when installing deps
-            if enable_artifacts_mirror:
-                mirror_add_output = spack_cmd(
-                    'mirror', 'add', 'local_mirror', artifact_mirror_url)
-                tty.debug('spack mirror add:')
-                tty.debug(mirror_add_output)
+        mirror_list_output = spack_cmd('mirror', 'list')
+        tty.debug('listing spack mirrors:')
+        tty.debug(mirror_list_output)
 
-            mirror_list_output = spack_cmd('mirror', 'list')
-            tty.debug('listing spack mirrors:')
-            tty.debug(mirror_list_output)
+        # 2) build up install arguments
+        install_args = ['-d', '-v', '-k', 'install', '--keep-stage']
 
-            # 2) build up install arguments
-            install_args = ['-d', '-v', '-k', 'install', '--keep-stage']
+        # 3) create/register a new build on CDash (if enabled)
+        cdash_args = []
+        if enable_cdash:
+            tty.debug('Registering build with CDash')
+            (cdash_build_id,
+                cdash_build_stamp) = spack_ci.register_cdash_build(
+                cdash_build_name, cdash_base_url, cdash_project,
+                cdash_site, job_spec_buildgroup)
 
-            # 3) create/register a new build on CDash (if enabled)
-            cdash_args = []
-            if enable_cdash:
-                tty.debug('Registering build with CDash')
-                (cdash_build_id,
-                    cdash_build_stamp) = spack_ci.register_cdash_build(
-                    cdash_build_name, cdash_base_url, cdash_project,
-                    cdash_site, job_spec_buildgroup)
+            cdash_upload_url = '{0}/submit.php?project={1}'.format(
+                cdash_base_url, cdash_project_enc)
 
-                cdash_upload_url = '{0}/submit.php?project={1}'.format(
-                    cdash_base_url, cdash_project_enc)
+            cdash_args = [
+                '--cdash-upload-url', cdash_upload_url,
+                '--cdash-build', cdash_build_name,
+                '--cdash-site', cdash_site,
+                '--cdash-buildstamp', cdash_build_stamp,
+            ]
 
-                cdash_args = [
-                    '--cdash-upload-url', cdash_upload_url,
-                    '--cdash-build', cdash_build_name,
-                    '--cdash-site', cdash_site,
-                    '--cdash-buildstamp', cdash_build_stamp,
-                ]
+        spec_cli_arg = [job_spec_yaml_path]
 
-            spec_cli_arg = [job_spec_yaml_path]
+        tty.debug('Installing package')
 
-            tty.debug('Installing package')
+        try:
+            # Two-pass install is intended to avoid spack trying to
+            # install from buildcache even though the locally computed
+            # full hash is different than the one stored in the spec.yaml
+            # file on the remote mirror.
+            first_pass_args = install_args + [
+                '--cache-only',
+                '--only',
+                'dependencies',
+            ]
+            first_pass_args.extend(spec_cli_arg)
+            tty.debug('First pass install arguments: {0}'.format(
+                first_pass_args))
+            spack_cmd(*first_pass_args)
 
-            try:
-                # Two-pass install is intended to avoid spack trying to
-                # install from buildcache even though the locally computed
-                # full hash is different than the one stored in the spec.yaml
-                # file on the remote mirror.
-                first_pass_args = install_args + [
-                    '--cache-only',
-                    '--only',
-                    'dependencies',
-                ]
-                first_pass_args.extend(spec_cli_arg)
-                tty.debug('First pass install arguments: {0}'.format(
-                    first_pass_args))
-                spack_cmd(*first_pass_args)
+            # Overwrite the changed environment file so it doesn't
+            # the next install invocation.
+            shutil.copyfile(env_dst_path, env_src_path)
 
-                # Overwrite the changed environment file so it doesn't
-                # the next install invocation.
-                shutil.copyfile(env_dst_path, env_src_path)
+            second_pass_args = install_args + [
+                '--no-cache',
+                '--only',
+                'package',
+            ]
+            second_pass_args.extend(cdash_args)
+            second_pass_args.extend(spec_cli_arg)
+            tty.debug('Second pass install arguments: {0}'.format(
+                second_pass_args))
+            spack_cmd(*second_pass_args)
+        except Exception as inst:
+            tty.error('Caught exception during install:')
+            tty.error(inst)
 
-                second_pass_args = install_args + [
-                    '--no-cache',
-                    '--only',
-                    'package',
-                ]
-                second_pass_args.extend(cdash_args)
-                second_pass_args.extend(spec_cli_arg)
-                tty.debug('Second pass install arguments: {0}'.format(
-                    second_pass_args))
-                spack_cmd(*second_pass_args)
-            except Exception as inst:
-                tty.error('Caught exception during install:')
-                tty.error(inst)
+        spack_ci.copy_stage_logs_to_artifacts(job_spec, job_log_dir)
 
-            spack_ci.copy_stage_logs_to_artifacts(job_spec, job_log_dir)
+        # 4) create buildcache on remote mirror
+        spack_ci.push_mirror_contents(env, job_spec, job_spec_yaml_path,
+                                      remote_mirror_url, cdash_build_id)
 
-            # 4) create buildcache on remote mirror
-            spack_ci.push_mirror_contents(env, job_spec, job_spec_yaml_path,
-                                          remote_mirror_url, cdash_build_id)
+        # 5) create another copy of that buildcache on "local artifact
+        # mirror" (only done if cash reporting is enabled)
+        spack_ci.push_mirror_contents(env, job_spec, job_spec_yaml_path,
+                                      artifact_mirror_url, cdash_build_id)
 
-            # 5) create another copy of that buildcache on "local artifact
-            # mirror" (only done if cash reporting is enabled)
-            spack_ci.push_mirror_contents(env, job_spec, job_spec_yaml_path,
-                                          artifact_mirror_url, cdash_build_id)
-
-            # 6) relate this build to its dependencies on CDash (if enabled)
-            if enable_cdash:
-                spack_ci.relate_cdash_builds(
-                    spec_map, cdash_base_url, cdash_build_id, cdash_project,
-                    artifact_mirror_url or remote_mirror_url)
-        else:
-            # There is nothing to do here unless "local artifact mirror" is
-            # enabled, in which case, we need to download the buildcache to
-            # the local artifacts directory to be used by dependent jobs in
-            # subsequent stages
-            tty.debug('No need to rebuild {0}'.format(job_spec_pkg_name))
-            if enable_artifacts_mirror:
-                tty.debug('Getting {0} buildcache'.format(job_spec_pkg_name))
-                tty.debug('Downloading to {0}'.format(build_cache_dir))
-                buildcache.download_buildcache_files(
-                    job_spec, build_cache_dir, True, remote_mirror_url)
+        # 6) relate this build to its dependencies on CDash (if enabled)
+        if enable_cdash:
+            spack_ci.relate_cdash_builds(
+                spec_map, cdash_base_url, cdash_build_id, cdash_project,
+                artifact_mirror_url or remote_mirror_url)
+    else:
+        # There is nothing to do here unless "local artifact mirror" is
+        # enabled, in which case, we need to download the buildcache to
+        # the local artifacts directory to be used by dependent jobs in
+        # subsequent stages
+        tty.debug('No need to rebuild {0}'.format(job_spec_pkg_name))
+        if enable_artifacts_mirror:
+            tty.debug('Getting {0} buildcache'.format(job_spec_pkg_name))
+            tty.debug('Downloading to {0}'.format(build_cache_dir))
+            buildcache.download_buildcache_files(
+                job_spec, build_cache_dir, True, remote_mirror_url)
 
 
 def ci_start(args):
