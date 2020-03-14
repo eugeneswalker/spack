@@ -30,6 +30,7 @@ class Slate(Package):
     depends_on('mercurial', type='build')
     depends_on('mpi', when='+mpi')
 
+    depends_on('python', type='build')
     conflicts('%gcc@:5')
 
     def setup_build_environment(self, env):
