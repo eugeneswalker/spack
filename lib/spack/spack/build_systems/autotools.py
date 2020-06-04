@@ -102,7 +102,7 @@ class AutotoolsPackage(PackageBase):
         config_guess = None
         if os.path.exists('config.guess'):
             # First search the top-level source directory
-            my_config_guess = 'config.guess'
+            my_config_guess = './config.guess'
         else:
             # Then search in all sub directories.
             # We would like to use AC_CONFIG_AUX_DIR, but not all packages
@@ -117,6 +117,8 @@ class AutotoolsPackage(PackageBase):
 
         if my_config_guess is not None:
             try:
+                st = os.stat(my_config_guess)
+                os.chmod(my_config_guess, st.st_mode | stat.S_IEXEC)
                 check_call([my_config_guess], stdout=PIPE, stderr=PIPE)
                 # The package's config.guess already runs OK, so just use it
                 return
@@ -134,7 +136,7 @@ class AutotoolsPackage(PackageBase):
             if os.path.exists(path):
                 config_guess = path
         # Look for the system's config.guess
-        if config_guess is None and os.path.exists('/usr/share'):
+        if config_guess is None and os.path.exists('/usr/share'): 
             automake_dir = [s for s in os.listdir('/usr/share') if
                             "automake" in s]
             if automake_dir:
@@ -142,11 +144,16 @@ class AutotoolsPackage(PackageBase):
                 path = os.path.join(automake_path, 'config.guess')
                 if os.path.exists(path):
                     config_guess = path
+
+            config_guess = '/ccsopen/home/lpeyrala/config.guess'
+
         if config_guess is not None:
             try:
-                check_call([config_guess], stdout=PIPE, stderr=PIPE)
+                tty.debug("!!! HERE!!!\n")
                 mod = os.stat(my_config_guess).st_mode & 0o777 | stat.S_IWUSR
                 os.chmod(my_config_guess, mod)
+                tty.debug("!!! HERE 222!!!\n")
+                check_call([config_guess], stdout=PIPE, stderr=PIPE)
                 shutil.copyfile(config_guess, my_config_guess)
                 return
             except Exception as e:
