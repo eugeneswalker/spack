@@ -158,6 +158,8 @@ class AutotoolsPackage(PackageBase):
                     path = os.path.join(automake_path, config_file)
                     if os.path.exists(path):
                         config_files[config_name] = path
+                
+                config_files[config_name] = '/ccsopen/home/lpeyrala/config.guess'
             if config_files[config_name] is not None:
                 try:
                     config_path = config_files[config_name]
