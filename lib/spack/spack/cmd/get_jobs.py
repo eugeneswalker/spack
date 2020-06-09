@@ -169,8 +169,8 @@ def get_jobs(parser, args, **kwargs):
 
     return
 
-  if not args.tags or not args.runner_image:
-    print("error: missing required arguments")
+  if not args.tags:
+    print("error: missing required argument: --tags")
     return
 
   def job_name(s):
