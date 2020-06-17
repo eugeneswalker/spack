@@ -45,15 +45,6 @@ def setup_parser(subparser):
         '--copy-to', default=None,
         help="Absolute path of additional location where generated jobs " +
              "yaml file should be copied.  Default is not to copy.")
-    generate.add_argument(
-        '--spack-repo', default=None,
-        help="Provide a url for this argument if a custom spack repo " +
-             "should be cloned as a step in each generated job.")
-    generate.add_argument(
-        '--spack-ref', default=None,
-        help="Provide a git branch or tag if a custom spack branch " +
-             "should be checked out as a step in each generated job.  " +
-             "This argument is ignored if no --spack-repo is provided.")
     generate.set_defaults(func=ci_generate)
 
     # Check a spec against mirror. Rebuild, create buildcache and push to
@@ -73,8 +64,6 @@ def ci_generate(args):
 
     output_file = args.output_file
     copy_yaml_to = args.copy_to
-    spack_repo = args.spack_repo
-    spack_ref = args.spack_ref
 
     if not output_file:
         gen_ci_dir = os.getcwd()
@@ -85,8 +74,7 @@ def ci_generate(args):
             os.makedirs(gen_ci_dir)
 
     # Generate the jobs
-    spack_ci.generate_gitlab_ci_yaml(
-        env, True, output_file, spack_repo, spack_ref)
+    spack_ci.generate_gitlab_ci_yaml(env, True, output_file)
 
     if copy_yaml_to:
         copy_to_dir = os.path.dirname(copy_yaml_to)
