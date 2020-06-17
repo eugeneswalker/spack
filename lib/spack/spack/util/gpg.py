@@ -13,7 +13,8 @@ from spack.util.executable import which
 
 _gnupg_version_re = r"^gpg \(GnuPG\) (.*)$"
 
-GNUPGHOME = spack.paths.gpg_path
+GNUPGHOME_ENV = os.environ.get("GNUPGHOME")
+GNUPGHOME = spack.paths.gpg_path if GNUPGHOME_ENV is None else GNUPGHOME_ENV
 
 
 def parse_keys_output(output):
