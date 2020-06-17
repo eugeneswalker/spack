@@ -3,7 +3,6 @@ import spack.mirror
 import spack.hash_types as ht
 import spack.binary_distribution as bindist
 import llnl.util.tty as tty
-import boto3
 import yaml
 import sys
 import os
