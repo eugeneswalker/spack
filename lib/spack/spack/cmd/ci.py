@@ -78,12 +78,10 @@ def ci_generate(args):
 
     output_file = args.output_file
     copy_yaml_to = args.copy_to
-<<<<<<< HEAD
+
     spack_repo = args.spack_repo
     spack_ref = args.spack_ref
     run_optimizer = args.optimize
-=======
->>>>>>> user-defined-pipeline-scripts
 
     if not output_file:
         gen_ci_dir = os.getcwd()
