@@ -78,9 +78,12 @@ def ci_generate(args):
 
     output_file = args.output_file
     copy_yaml_to = args.copy_to
+<<<<<<< HEAD
     spack_repo = args.spack_repo
     spack_ref = args.spack_ref
     run_optimizer = args.optimize
+=======
+>>>>>>> user-defined-pipeline-scripts
 
     if not output_file:
         gen_ci_dir = os.getcwd()
@@ -91,9 +94,13 @@ def ci_generate(args):
             os.makedirs(gen_ci_dir)
 
     # Generate the jobs
+<<<<<<< HEAD
     spack_ci.generate_gitlab_ci_yaml(
         env, True, output_file, spack_repo, spack_ref,
         run_optimizer=run_optimizer)
+=======
+    spack_ci.generate_gitlab_ci_yaml(env, True, output_file)
+>>>>>>> user-defined-pipeline-scripts
 
     if copy_yaml_to:
         copy_to_dir = os.path.dirname(copy_yaml_to)

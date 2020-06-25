@@ -347,7 +347,6 @@ spack:
     some-mirror: https://my.fake.mirror
   gitlab-ci:
     enable-artifacts-buildcache: True
-    enable-debug-messages: True
     mappings:
       - match:
           - archive-files
@@ -385,6 +384,88 @@ spack:
             orig_file = str(tmpdir.join('.gitlab-ci.yml'))
 
             assert(filecmp.cmp(orig_file, copy_to_file) is True)
+
+
+def test_ci_generate_with_script_and_variables(tmpdir, mutable_mock_env_path,
+                                               env_deactivate, install_mockery,
+                                               mock_packages):
+    """Make sure we it doesn't break if we configure cdash"""
+    filename = str(tmpdir.join('spack.yaml'))
+    with open(filename, 'w') as f:
+        f.write("""\
+spack:
+  specs:
+    - archive-files
+  mirrors:
+    some-mirror: https://my.fake.mirror
+  gitlab-ci:
+    mappings:
+      - match:
+          - archive-files
+        runner-attributes:
+          tags:
+            - donotcare
+          variables:
+            ONE: $env:INTERP_ON_GENERATE
+            TWO: ${INTERP_ON_BUILD}
+          before_script:
+            - mkdir /some/path
+            - pushd /some/path
+            - git clone ${SPACK_REPO}
+            - cd spack
+            - git checkout ${SPACK_REF}
+            - popd
+          script:
+            - spack -d ci rebuild
+          after_script:
+            - rm -rf /some/path/spack
+""")
+
+    with tmpdir.as_cwd():
+        env_cmd('create', 'test', './spack.yaml')
+        outputfile = str(tmpdir.join('.gitlab-ci.yml'))
+
+        with ev.read('test'):
+            os.environ['INTERP_ON_GENERATE'] = 'success'
+            ci_cmd('generate', '--output-file', outputfile)
+
+            with open(outputfile) as f:
+                contents = f.read()
+                yaml_contents = syaml.load(contents)
+
+                found_it = False
+
+                for ci_key in yaml_contents.keys():
+                    ci_obj = yaml_contents[ci_key]
+                    if 'archive-files' in ci_key:
+                        # Ensure we have variables, possibly interpolated
+                        assert('variables' in ci_obj)
+                        var_d = ci_obj['variables']
+                        assert('ONE' in var_d)
+                        assert(var_d['ONE'] == 'success')
+                        assert('TWO' in var_d)
+                        assert(var_d['TWO'] == '${INTERP_ON_BUILD}')
+
+                        # Ensure we have scripts verbatim
+                        assert('before_script' in ci_obj)
+                        before_script = ci_obj['before_script']
+                        assert(before_script[0] == 'mkdir /some/path')
+                        assert(before_script[1] == 'pushd /some/path')
+                        assert(before_script[2] == 'git clone ${SPACK_REPO}')
+                        assert(before_script[3] == 'cd spack')
+                        assert(before_script[4] == 'git checkout ${SPACK_REF}')
+                        assert(before_script[5] == 'popd')
+
+                        assert('script' in ci_obj)
+                        assert(ci_obj['script'][0] == 'spack -d ci rebuild')
+
+                        assert('after_script' in ci_obj)
+                        after_script = ci_obj['after_script'][0]
+                        assert(after_script == 'rm -rf /some/path/spack')
+
+                        found_it = True
+
+            assert(found_it)
 
 
 def test_ci_generate_pkg_with_deps(tmpdir, mutable_mock_env_path,
@@ -531,72 +612,6 @@ spack:
                 if 'externaltool' in ci_key:
                     print('Erroneously staged "externaltool" pkg')
                     assert(False)
-
-
-def test_ci_generate_debug_with_custom_spack(tmpdir, mutable_mock_env_path,
-                                             env_deactivate, install_mockery,
-                                             mock_packages):
-    """Make sure we generate cloning of spack in job script if needed"""
-    filename = str(tmpdir.join('spack.yaml'))
-    with open(filename, 'w') as f:
-        f.write("""\
-spack:
-  specs:
-    - archive-files
-  mirrors:
-    some-mirror: https://my.fake.mirror
-  gitlab-ci:
-    enable-artifacts-buildcache: True
-    enable-debug-messages: True
-    mappings:
-      - match:
-          - archive-files
-        runner-attributes:
-          tags:
-            - donotcare
-          image: donotcare
-""")
-
-    with tmpdir.as_cwd():
-        env_cmd('create', 'test', './spack.yaml')
-        outfile = str(tmpdir.join('.gitlab-ci.yml'))
-
-        with ev.read('test'):
-            spack_repo = 'https://github.com/usera/spack.git'
-            spack_ref = 'custom-branch'
-            expected_clone_str = 'git clone "{0}"'.format(spack_repo)
-
-            ci_cmd('generate', '--output-file', outfile, '--spack-repo',
-                   spack_repo, '--spack-ref', spack_ref)
-
-            with open(outfile) as f:
-                contents = f.read()
-                yaml_contents = syaml.load(contents)
-                for ci_key in yaml_contents.keys():
-                    if '(specs)' in ci_key:
-                        next_job = yaml_contents[ci_key]
-                        print(next_job)
-                        assert('before_script' in next_job)
-                        before_script = next_job['before_script']
-                        for step in before_script:
-                            if expected_clone_str in step:
-                                break
-                        else:
-                            msg = 'job "{0}" did not clone spack repo'.format(
-                                ci_key)
-                            print(msg)
-                            assert(False)
-
-                        assert('script' in next_job)
-                        script = next_job['script']
-                        for step in script:
-                            if 'spack -d ci rebuild' in step:
-                                break
-                        else:
-                            msg = 'job {0} missing rebuild command'.format(
-                                ci_key)
-                            print(msg)
-                            assert(False)
 
 
 def test_ci_rebuild_basic(tmpdir, mutable_mock_env_path, env_deactivate,
