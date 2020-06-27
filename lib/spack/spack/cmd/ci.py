@@ -294,12 +294,12 @@ def ci_rebuild(args):
                 tty.debug('spack mirror add:')
                 tty.debug(mirror_add_output)
 
-            mirror_list_output = spack_cmd('mirror', 'list')
+            mirror_list_output = spack_cmd('-e', '.', 'mirror', 'list')
             tty.debug('listing spack mirrors:')
             tty.debug(mirror_list_output)
 
             # 2) build up install arguments
-            install_args = ['-d', '-v', '-k', 'install', '--keep-stage']
+            install_args = ['-d', '-v', '-k', '-e', '.', 'install', '--keep-stage']
 
             # 3) create/register a new build on CDash (if enabled)
             cdash_args = []
