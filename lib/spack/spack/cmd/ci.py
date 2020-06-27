@@ -291,7 +291,7 @@ def ci_rebuild(args):
             tty.debug(mirror_list_output)
 
             # 2) build up install arguments
-            install_args = ['-d', '-v', '-k', 'install', '--keep-stage']
+            install_args = ['-d', '-v', '-k', '-e', '.', 'install', '--keep-stage']
 
             # 3) create/register a new build on CDash (if enabled)
             cdash_args = []
