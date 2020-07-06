@@ -701,6 +701,7 @@ def generate_gitlab_ci_yaml(env, print_summary, output_file, run_optimizer=False
                 artifact_paths = [
                     'jobs_scratch_dir',
                     'cdash_report',
+                    'artifacts'
                 ]
 
                 if enable_artifacts_buildcache:
