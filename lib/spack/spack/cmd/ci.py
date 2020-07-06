@@ -45,15 +45,7 @@ def setup_parser(subparser):
         '--copy-to', default=None,
         help="Absolute path of additional location where generated jobs " +
              "yaml file should be copied.  Default is not to copy.")
-    generate.add_argument(
-        '--spack-repo', default=None,
-        help="Provide a url for this argument if a custom spack repo " +
-             "should be cloned as a step in each generated job.")
-    generate.add_argument(
-        '--spack-ref', default=None,
-        help="Provide a git branch or tag if a custom spack branch " +
-             "should be checked out as a step in each generated job.  " +
-             "This argument is ignored if no --spack-repo is provided.")
+ 
     generate.add_argument(
         '--optimize', action='store_true', default=False,
         help="(Experimental) run the generated document through a series of "
@@ -63,6 +55,7 @@ def setup_parser(subparser):
         '--dependencies', action='store_true', default=False,
         help="(Experimental) disable DAG scheduling; use "
              ' "plain" dependencies.')
+    
     generate.set_defaults(func=ci_generate)
 
     # Check a spec against mirror. Rebuild, create buildcache and push to
@@ -82,8 +75,6 @@ def ci_generate(args):
 
     output_file = args.output_file
     copy_yaml_to = args.copy_to
-    spack_repo = args.spack_repo
-    spack_ref = args.spack_ref
     run_optimizer = args.optimize
     use_dependencies = args.dependencies
 
@@ -96,8 +87,9 @@ def ci_generate(args):
             os.makedirs(gen_ci_dir)
 
     # Generate the jobs
+
     spack_ci.generate_gitlab_ci_yaml(
-        env, True, output_file, spack_repo, spack_ref,
+        env, True, output_file,
         run_optimizer=run_optimizer,
         use_dependencies=use_dependencies)
 
