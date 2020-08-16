@@ -60,8 +60,8 @@ class M4(AutotoolsPackage, GNUMirrorPackage):
         if spec.satisfies('%fj') and not spec.satisfies('platform=darwin'):
             args.append('LDFLAGS=-rtlib=compiler-rt')
 
-        if spec.satisfies('%intel'):
-            args.append('CFLAGS=-no-gcc')
+        #if spec.satisfies('%intel'):
+        #    args.append('CFLAGS=-no-gcc')
 
         if '+sigsegv' in spec:
             args.append('--with-libsigsegv-prefix={0}'.format(
