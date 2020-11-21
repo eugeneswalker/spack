@@ -30,6 +30,9 @@ from llnl.util.lang import memoized, list_modules
 
 @memoized
 def all_hook_modules():
+    import sys
+    print("\n\nINSIDE hooks __init__.py:all_hook_modules(): \nsbang loaded = {}\n\n".format("spack.hooks.sbang" in sys.modules))
+
     modules = []
     for name in list_modules(spack.paths.hooks_path):
         mod_name = __name__ + '.' + name
@@ -40,6 +43,13 @@ def all_hook_modules():
             last_mod = mod
         else:
             modules.append(mod)
+
+        print("\n\nINSIDE hooks __init__.py:all_hook_modules() loop: {}\nsbang loaded = {}\n\n".format(name,"spack.hooks.sbang" in sys.modules))
+#        if "spack.hooks.sbang" in sys.modules:
+#            try:
+#                import spack.hooks.sbang
+#            except Exc:
+#                raise
 
     # put `write_install_manifest` as the last hook to run
     modules.append(last_mod)
@@ -52,12 +62,15 @@ class HookRunner(object):
         self.hook_name = hook_name
 
     def __call__(self, *args, **kwargs):
+        #import spack.hooks.sbang
+        import sys
+        print("\n\nINSIDE hooks __init__.py:HookRunner(): \nsbang loaded = {}\n\n".format("spack.hooks.sbang" in sys.modules))
         for module in all_hook_modules():
             if hasattr(module, self.hook_name):
                 hook = getattr(module, self.hook_name)
                 if hasattr(hook, '__call__'):
                     hook(*args, **kwargs)
-
+                print("\n\nINSIDE hooks __init__.py:HookRunner() {}: \nsbang loaded = {}\n\n".format(module, "spack.hooks.sbang" in sys.modules))
 
 pre_install = HookRunner('pre_install')
 post_install = HookRunner('post_install')

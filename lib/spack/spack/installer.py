@@ -1350,6 +1350,9 @@ class PackageInstaller(object):
 
         Args:
             pkg (Package): the package to be built and installed"""
+        #import spack.hooks.sbang as sbang
+        #import spack.hooks.sbang
+        print("\n\nINSIDE installer.py:install(): \nsbang loaded = {}\n\n".format("spack.hooks.sbang" in sys.modules))
         self._init_queue()
 
         fail_fast_err = 'Terminating after first install failure'

@@ -813,6 +813,7 @@ def relocate_text(
     # sbang was a bash script, and it lived in the spack prefix. It is
     # now a POSIX script that lives in the install prefix. Old packages
     # will have the old sbang location in their shebangs.
+    print("\n\nRELOCATING SBANG INSIDE relocate.relocate_text\n\n")
     import spack.hooks.sbang as sbang
     orig_sbang = '#!/bin/bash {0}/bin/sbang'.format(orig_spack)
     new_sbang = sbang.sbang_shebang_line()

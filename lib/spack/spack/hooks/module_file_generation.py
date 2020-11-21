@@ -16,6 +16,10 @@ def _for_each_enabled(spec, method_name):
         tty.debug('NO MODULE WRITTEN: list of enabled module files is empty')
         return
 
+    #import spack.hooks.sbang as sbang
+    import sys
+    print("\n\nINSIDE hooks module_file_generation.py:_for_each_enabled(): \nsbang loaded = {}\n\n".format("spack.hooks.sbang" in sys.modules))
+
     for name in enabled:
         generator = spack.modules.module_types[name](spec)
         try:
@@ -27,6 +31,9 @@ def _for_each_enabled(spec, method_name):
 
 
 def post_install(spec):
+    #import spack.hooks.sbang as sbang
+    import sys
+    print("\n\nINSIDE hooks module_file_generation.py:post_install(): \nsbang loaded = {}\n\n".format("spack.hooks.sbang" in sys.modules))
     _for_each_enabled(spec, 'write')
 
 
