@@ -31,7 +31,8 @@ from llnl.util.lang import memoized, list_modules
 @memoized
 def all_hook_modules():
     import sys
-    print("\n\nINSIDE hooks __init__.py:all_hook_modules(): \nsbang loaded = {}\n\n".format("spack.hooks.sbang" in sys.modules))
+    #import spack.hooks.sbang
+    print("\n\nINSIDE hooks __init__.py:all_hook_modules(): \nsbang loaded = {}\n{}\n\n".format("spack.hooks.sbang" in sys.modules, "\n".join(sys.path)))
 
     modules = []
     for name in list_modules(spack.paths.hooks_path):
@@ -44,7 +45,7 @@ def all_hook_modules():
         else:
             modules.append(mod)
 
-        print("\n\nINSIDE hooks __init__.py:all_hook_modules() loop: {}\nsbang loaded = {}\n\n".format(name,"spack.hooks.sbang" in sys.modules))
+        print("\n\nINSIDE hooks __init__.py:all_hook_modules() loop: {}\nsbang loaded = {}\n{}\n\n".format(name,"spack.hooks.sbang" in sys.modules,"\n".join(sys.path)))
 #        if "spack.hooks.sbang" in sys.modules:
 #            try:
 #                import spack.hooks.sbang
@@ -64,13 +65,13 @@ class HookRunner(object):
     def __call__(self, *args, **kwargs):
         #import spack.hooks.sbang
         import sys
-        print("\n\nINSIDE hooks __init__.py:HookRunner(): \nsbang loaded = {}\n\n".format("spack.hooks.sbang" in sys.modules))
+        print("\n\nINSIDE hooks __init__.py:HookRunner(): \nsbang loaded = {}\n{}\n\n".format("spack.hooks.sbang" in sys.modules, "\n".join(sys.path)))
         for module in all_hook_modules():
             if hasattr(module, self.hook_name):
                 hook = getattr(module, self.hook_name)
                 if hasattr(hook, '__call__'):
                     hook(*args, **kwargs)
-                print("\n\nINSIDE hooks __init__.py:HookRunner() {}: \nsbang loaded = {}\n\n".format(module, "spack.hooks.sbang" in sys.modules))
+                print("\n\nINSIDE hooks __init__.py:HookRunner() {}: \nsbang loaded = {}\n{}\n\n".format(module, "spack.hooks.sbang" in sys.modules, "\n".join(sys.path)))
 
 pre_install = HookRunner('pre_install')
 post_install = HookRunner('post_install')

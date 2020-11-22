@@ -18,7 +18,8 @@ def _for_each_enabled(spec, method_name):
 
     #import spack.hooks.sbang as sbang
     import sys
-    print("\n\nINSIDE hooks module_file_generation.py:_for_each_enabled(): \nsbang loaded = {}\n\n".format("spack.hooks.sbang" in sys.modules))
+    #import spack.hooks
+    print("\n\nINSIDE hooks module_file_generation.py:_for_each_enabled(): \nsbang loaded = {}\n{}\n\n".format("spack.hooks.sbang" in sys.modules, "\n".join(sys.path)))
 
     for name in enabled:
         generator = spack.modules.module_types[name](spec)
@@ -33,7 +34,7 @@ def _for_each_enabled(spec, method_name):
 def post_install(spec):
     #import spack.hooks.sbang as sbang
     import sys
-    print("\n\nINSIDE hooks module_file_generation.py:post_install(): \nsbang loaded = {}\n\n".format("spack.hooks.sbang" in sys.modules))
+    print("\n\nINSIDE hooks module_file_generation.py:post_install(): \nsbang loaded = {}\n{}\n\n".format("spack.hooks.sbang" in sys.modules, "\n".join(sys.path)))
     _for_each_enabled(spec, 'write')
 
 

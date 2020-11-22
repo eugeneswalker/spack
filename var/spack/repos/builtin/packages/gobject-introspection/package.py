@@ -4,14 +4,17 @@
 # SPDX-License-Identifier: (Apache-2.0 OR MIT)
 
 from spack import *
-import spack.hooks.sbang as sbang
 
 
 class GobjectIntrospection(Package):
     """The GObject Introspection is used to describe the program APIs and
     collect them in a uniform, machine readable format.Cairo is a 2D graphics
     library with support for multiple output"""
-
+    import sys
+    print("\nHooks? ", spack.hooks)
+    print("\n\n\n")
+    print("\n\nINSIDE gobject-introspection package.py:GobjectIntrospection(): \nsbang loaded = {}\n{}\n\n".format("spack.hooks.sbang" in sys.modules, "\n".join(sys.path)))
+    import spack.hooks.sbang as sbang
     homepage = "https://wiki.gnome.org/Projects/GObjectIntrospection"
     url      = "http://ftp.gnome.org/pub/gnome/sources/gobject-introspection/1.49/gobject-introspection-1.49.2.tar.xz"
 
