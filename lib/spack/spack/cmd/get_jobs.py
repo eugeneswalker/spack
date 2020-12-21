@@ -296,3 +296,5 @@ def get_jobs(parser, args, **kwargs):
     spec_yaml_path = os.path.join(specs_dir, "{}.yaml".format(job_name_brief(s)))
     with open(spec_yaml_path, 'w') as fs:
       fs.write(spec_yaml)
+
+  return 300
