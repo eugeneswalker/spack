@@ -12,58 +12,21 @@ from itertools import chain
 
 def setup_parser(subparser): 
   subparser.add_argument(
-    '--dd-only',
-    dest='dd_only',
-    action='store_true',
-    default=False,
-    required=False,
-    help="""only dump dependency and dependent information""") 
-  subparser.add_argument(
-    '--no-needs',
-    dest='use_needs',
-    action='store_false',
-    default=True,
-    required=False,
-    help="""where to write job specs yaml files to""") 
-  subparser.add_argument(
-    '--tags',
-    dest='tags',
-    required=False,
-    type=str,
-    help="""runner tags""")
-  subparser.add_argument(
     '--mirror',
     dest='mirror',
     required=False,
     help="""mirror to check""")
   subparser.add_argument(
-    '--runner-image',
-    dest='runner_image',
-    required=False,
-    help="""runner image""")
+    '--kv',
+    dest='kv',
+    action="append"
+  )
   subparser.add_argument(
-    '--output-file',
-    dest='output_file',
+    '--output', '-o',
+    dest='output',
+    default="./dag.json",
     required=False,
     help="""output file""")
-  subparser.add_argument(
-    '--output-dir',
-    dest='output_dir',
-    required=False,
-    help="""output dir""")
-  subparser.add_argument(
-    '--workdir',
-    dest='workdir',
-    required=False,
-    help="""work dir""")
-  subparser.add_argument(
-    '--env-in-env',
-    dest='env_in_env',
-    required=False,
-    default=False,
-    action='store_true',
-    help="""store spack environment as string in env var SPACK_ENV_YAML in downstream jobs"""
-  )
 
 description = "generate a build manifest containing each spack job needed to install an environment"
 section = "build"
@@ -73,11 +36,6 @@ def get_jobs(parser, args, **kwargs):
   blr = ["build", "link", "run"]
 
   e = env.get_env(None, 'get_jobs', required=True)
-
-  if args.env_in_env:
-    spack_env_str = ""
-    with open("./spack.yaml") as fs:
-      spack_env_str = fs.read()
 
   with spack.concretize.disable_compiler_existence_check():
     e.concretize()
@@ -150,34 +108,16 @@ def get_jobs(parser, args, **kwargs):
 
   if len(spec_hashes_rebuild) <= 0:
     print("No specs need rebuilding!")
-    return 200
-
-  if args.dd_only:
-    j = {}
-    for k in spec_hashes_rebuild:
-      v = all_specs[k]
-      nv = {
-        "dependencies": v['dependency_hashes'],
-        "dependents": v['dependent_hashes'],
-        "name": v['spec'].name,
-        "yaml": v['spec'].to_yaml(hash=ht.build_hash)
-      }
-      j[k] = nv
-
-    with open('dd.json','w') as fs:
-      fs.write(json.dumps(j, indent=1))
-
-    return
-
-  if not args.tags:
-    print("error: missing required argument: --tags")
-    return
+    return 0
 
   def job_name(s):
-    return "{}@{}%{}-{} {}".format(s.name, s.version, s.compiler, s.build_hash()[:6], s.architecture)
+    return "{}@{}%{}-{} {}".format(s.name, s.version, s.compiler, s.dag_hash()[:6], s.architecture)
 
   def job_name_brief(s):
-    return "{}-{}".format(s.name, s.build_hash()[:6])
+    return "{}-{}".format(s.name, s.dag_hash()[:6])
+  
+  def spec_filename(s):
+    return "{}.spec.yaml".format(job_name_brief(s))
 
   def spec_name(s):
     return "{}".format(s.name)
@@ -227,72 +167,49 @@ def get_jobs(parser, args, **kwargs):
     spec_hashes_rebuild.sort(key=ndeps)
     this_stage = []
 
-  # generate .gitlab-ci.yml
-  y = {'variables': {}}
-  if args.env_in_env:
-    y['variables']['SPACK_ENV_YAML'] = spack_env_str.replace('$','_DOLLAR_')
-
-  stages = []
-  for ii, hs in enumerate(spec_stages):
-    stage = "s{}".format(str(ii).zfill(2))
-    stages.append(stage)
+  y = {
+    "stages": [i for i in range(len(spec_stages))],
+    "jobs": {}
+  }
+  for stage_i, hs in enumerate(spec_stages):
     for h in hs:
       s = all_specs[h]["spec"]
-      job_brief = job_name_brief(s)
       job = job_name(s)
-      y[job] = {
-        "stage": stage,
-        "artifacts": {
-          "when": "always",
-          "paths": ["artifacts/"]
-        },
-        "variables": {
-          "SPEC_NAME": spec_name(s),
-          "SPEC_YAML": "{}".format(s.to_yaml(hash=ht.build_hash)),
-          "WORKDIR": args.workdir if args.workdir else ""
-        },
-        "script": [
-          "./run-ci-job.sh"
-        ] 
+      needs = [job_name(all_specs[dh]["spec"]) for dh in all_specs[h]["dependency_hashes"]]
+      y["jobs"][job] = {
+        "stage": stage_i,
+        "spec_name": spec_name(s),
+        "spec_yaml": "{}".format(s.to_yaml(hash=ht.build_hash)),
+        "spec_file": spec_filename(s),
+        "dag_hash": s.dag_hash()[:6],
+        "full_hash": s.full_hash()[:6],
+        "build_hash": s.build_hash()[:6],
+        "needs": needs
       }
 
-      tags_split = args.tags.split(',')
-      if len(tags_split) > 0:
-        y[job]['tags'] = tags_split
+  basename = os.path.basename(args.output)
+  dirname = os.path.dirname(args.output)
 
-      # docker image
-      if args.runner_image:
-        y[job]["image"] = args.runner_image
+  if len(dirname) == 0:
+    dirname = "."
 
-      # dag scheduling
-      needs = [job_name(all_specs[dh]["spec"]) for dh in all_specs[h]["dependency_hashes"]]
-      if args.use_needs and len(needs) > 0:
-          y[job]["needs"] = needs
-
-  # write .gitlab-ci.yml
-  y["stages"] = stages
-
-  if args.output_dir:
-    os.makedirs(args.output_dir, exist_ok=True)
-
-  ci_file_name = args.output_file if args.output_file else ".gitlab-ci.yml"
-  ci_file_path = os.path.abspath(ci_file_name)
-  if args.output_dir:
-    ci_file_path = os.path.abspath(os.path.join(args.output_dir, ci_file_name))
-  with open(ci_file_path,"w") as ymlfile:
-    yaml.dump(y, ymlfile, default_flow_style=False)
+  os.makedirs(dirname, exist_ok=True)
+  output_path = os.path.abspath(os.path.join(dirname, basename))
+  
+  with open(output_path, "w") as fs:
+    fs.write(json.dumps(y, indent=1))
   
   # write .spec.yaml files
-  spec_dir_name = "specs"
-  specs_dir = os.path.abspath(spec_dir_name)
-  if args.output_dir:
-    specs_dir = os.path.abspath(os.path.join(args.output_dir, spec_dir_name))
+  specs_dir_basename = "specs"
+  specs_dir = os.path.abspath(os.path.join(dirname, specs_dir_basename))
   os.makedirs(specs_dir, exist_ok=True)
 
   ss = list(chain.from_iterable(spec_stages))
   for h in ss:
     s = all_specs[h]["spec"]
     spec_yaml = s.to_yaml(hash=ht.build_hash) 
-    spec_yaml_path = os.path.join(specs_dir, "{}.yaml".format(job_name_brief(s)))
+    spec_yaml_path = os.path.join(specs_dir, spec_filename(s))
     with open(spec_yaml_path, 'w') as fs:
       fs.write(spec_yaml)
+
+  return 0
