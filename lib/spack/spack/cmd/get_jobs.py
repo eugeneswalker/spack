@@ -10,17 +10,19 @@ import copy
 import json
 from itertools import chain
 
-def setup_parser(subparser): 
+def setup_parser(subparser):
+  subparser.add_argument(
+    '--globalvar',
+    dest='global_vars',
+    action='append',
+    required=False,
+    help="""create global (key, val) pair"""
+  )
   subparser.add_argument(
     '--mirror',
     dest='mirror',
     required=False,
     help="""mirror to check""")
-  subparser.add_argument(
-    '--kv',
-    dest='kv',
-    action="append"
-  )
   subparser.add_argument(
     '--output', '-o',
     dest='output',
@@ -33,6 +35,16 @@ section = "build"
 level = "short"
 
 def get_jobs(parser, args, **kwargs):
+  global_vars = {}
+  if args.global_vars:
+    for kv in args.global_vars:
+      try:
+        k, v = kv.split('=', 1)
+        global_vars[k] = v
+      except:
+        tty.msg("Bad value for --globalvar: should be key=value format: {0} ...ignoring".format(kv))
+        return 1
+  
   blr = ["build", "link", "run"]
 
   e = env.get_env(None, 'get_jobs', required=True)
@@ -46,24 +58,27 @@ def get_jobs(parser, args, **kwargs):
     for s in cs.traverse_edges(deptype=blr, direction="children", cover="nodes", order="pre"):
       h = s.spec.build_hash()
       if h not in all_specs:
-        all_specs[h] = {"spec": s.spec, "dependency_hashes": [], "dependent_hashes": []}
+        all_specs[h] = {
+          "spec": s.spec, 
+          "dependency_hashes": [], 
+          "dependent_hashes": [],
+          "is_root": s.spec.dag_hash() == cs.dag_hash()
+        }
       
         q = list(s.spec.dependencies(deptype=blr))
-        ds = all_specs[h]["dependency_hashes"]
         while len(q) > 0:
           s2 = q.pop(0)
-          ds.append(s2.build_hash())
+          all_specs[h]["dependency_hashes"].append(s2.build_hash())
           q += list(s2.dependencies(deptype=blr))
-        all_specs[h]["dependency_hashes"] = list(set(ds))
+        all_specs[h]["dependency_hashes"] = list(set(all_specs[h]["dependency_hashes"]))
         
         q = list(s.spec.dependents(deptype=blr))
-        ds = all_specs[h]["dependent_hashes"]
         while len(q) > 0:
           s2 = q.pop(0)
-          ds.append(s2.build_hash())
+          all_specs[h]["dependent_hashes"].append(s2.build_hash())
           q += list(s2.dependents(deptype=blr))
-        all_specs[h]["dependent_hashes"] = list(set(ds))
-
+        all_specs[h]["dependent_hashes"] = list(set(all_specs[h]["dependent_hashes"]))
+  
   # accumulate dependents + dependencies
   for rh, ro in all_specs.items():
     for dh in ro["dependent_hashes"]:
@@ -169,16 +184,19 @@ def get_jobs(parser, args, **kwargs):
 
   y = {
     "stages": [i for i in range(len(spec_stages))],
+    "variables": {k:v for k, v in global_vars.items()},
     "jobs": {}
   }
   for stage_i, hs in enumerate(spec_stages):
     for h in hs:
       s = all_specs[h]["spec"]
+      is_root = all_specs[h]["is_root"]
       job = job_name(s)
       needs = [job_name(all_specs[dh]["spec"]) for dh in all_specs[h]["dependency_hashes"]]
       y["jobs"][job] = {
         "stage": stage_i,
         "spec_name": spec_name(s),
+        "is_root": is_root,
         "spec_yaml": "{}".format(s.to_yaml(hash=ht.build_hash)),
         "spec_file": spec_filename(s),
         "dag_hash": s.dag_hash()[:6],
@@ -207,9 +225,9 @@ def get_jobs(parser, args, **kwargs):
   ss = list(chain.from_iterable(spec_stages))
   for h in ss:
     s = all_specs[h]["spec"]
-    spec_yaml = s.to_yaml(hash=ht.build_hash) 
-    spec_yaml_path = os.path.join(specs_dir, spec_filename(s))
-    with open(spec_yaml_path, 'w') as fs:
-      fs.write(spec_yaml)
+    y = s.to_yaml(hash=ht.build_hash) 
+    yp = os.path.join(specs_dir, spec_filename(s))
+    with open(yp, 'w') as fs:
+      fs.write(y)
 
   return 0
