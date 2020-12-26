@@ -19,6 +19,13 @@ def setup_parser(subparser):
     help="""create global (key, val) pair"""
   )
   subparser.add_argument(
+    '--spack-ref',
+    dest='spack_ref',
+    required=False,
+    default="",
+    help="""Spack Git SHA Ref"""
+  )
+  subparser.add_argument(
     '--mirror',
     dest='mirror',
     required=False,
@@ -184,6 +191,7 @@ def get_jobs(parser, args, **kwargs):
 
   y = {
     "stages": [i for i in range(len(spec_stages))],
+    "spack_ref": args.spack_ref,
     "variables": {k:v for k, v in global_vars.items()},
     "jobs": {}
   }
