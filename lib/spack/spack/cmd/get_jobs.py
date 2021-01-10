@@ -205,7 +205,7 @@ def get_jobs(parser, args, **kwargs):
         "stage": stage_i,
         "spec_name": spec_name(s),
         "is_root": is_root,
-        "spec_yaml": "{}".format(s.to_yaml(hash=ht.build_hash)),
+        #"spec_yaml": "{}".format(s.to_yaml(hash=ht.build_hash)),
         "spec_file": spec_filename(s),
         "dag_hash": s.dag_hash()[:6],
         "full_hash": s.full_hash()[:6],
