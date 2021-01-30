@@ -7,7 +7,7 @@ from spack import *
 import sys
 
 
-class NaluWind(CMakePackage):
+class NaluWind(CMakePackage, CudaPackage):
     """Nalu-Wind: Wind energy focused variant of Nalu."""
 
     homepage = "https://github.com/exawind/nalu-wind"
@@ -37,6 +37,9 @@ class NaluWind(CMakePackage):
             description='Compile with Catalyst support')
     variant('fftw', default=False,
             description='Compile with FFTW support')
+    variant('cuda', default=False,
+            description='Compile with CUDA support')
+
 
     variant('wind-utils', default=False,
             description='Build wind-utils')
@@ -60,6 +63,13 @@ class NaluWind(CMakePackage):
     depends_on('trilinos-catalyst-ioss-adapter', when='+catalyst')
     # FFTW doesn't have a 'shared' variant at this moment
     depends_on('fftw+mpi', when='+fftw')
+
+    def setup_build_environment(self, env):
+        if '+cuda' in self.spec:
+          env.set('CUDACXX', '{0}/bin/nvcc'.format(self.spec['cuda'].prefix))
+          env.set('OMPI_CXX', '{0}/utils/nvcc_wrapper'.format(self.stage.source_path))
+          env.set('MPICH_CXX', '{0}/utils/nvcc_wrapper'.format(self.stage.source_path))
+          env.set('MPICXX_CXX', '{0}/utils/nvcc_wrapper'.format(self.stage.source_path))
 
     def cmake_args(self):
         spec = self.spec
@@ -118,6 +128,11 @@ class NaluWind(CMakePackage):
             ])
         else:
             options.append('-DENABLE_FFTW:BOOL=OFF')
+
+        if '+cuda' in spec:
+            options.append('-DENABLE_CUDA=ON')
+        else:
+            options.append('-DENABLE_CUDA=OFF')
 
         if '+wind-utils' in spec:
             options.append('-DENABLE_WIND_UTILS=ON')
