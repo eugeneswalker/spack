@@ -17,6 +17,7 @@ class Amrex(CMakePackage, CudaPackage, ROCmPackage):
 
     maintainers = ['mic84', 'asalmgren']
 
+    version('amr-wind', branch='development', commit='df5bbe922563bf3ae9eb97a566014205e1a1b2f4')
     version('develop', branch='development')
     version('21.02', sha256='4a7ef997c43f9f03f1b06dd1aafa01218773a3265a5c1811f77eb4521b5e75b3')
     version('21.01', sha256='59de3ed429347ee6a7ad4f09c0c431248f2e081f59c301db37cacb36993622f4')
@@ -68,6 +69,8 @@ class Amrex(CMakePackage, CudaPackage, ROCmPackage):
             description='Enable Hypre interfaces')
     variant('petsc', default=False,
             description='Enable PETSc interfaces')
+    variant('pic', default=False,
+            description='Enable PIC')
 
     # Build dependencies
     depends_on('mpi', when='+mpi')
@@ -132,6 +135,50 @@ class Amrex(CMakePackage, CudaPackage, ROCmPackage):
             return ';'.join(str(x) for x in vf)
 
     #
+    # For versions > 20.11
+    #
+    @when('@20.12:,amr-wind')
+    def cmake_args(self):
+        args = [
+            '-DUSE_XSDK_DEFAULTS=ON',
+            self.define_from_variant('AMReX_SPACEDIM', 'dimensions'),
+            self.define_from_variant('BUILD_SHARED_LIBS', 'shared'),
+            self.define_from_variant('AMReX_MPI', 'mpi'),
+            self.define_from_variant('AMReX_OMP', 'openmp'),
+            '-DXSDK_PRECISION:STRING=%s' %
+            self.spec.variants['precision'].value.upper(),
+            self.define_from_variant('XSDK_ENABLE_Fortran', 'fortran'),
+            self.define_from_variant('AMReX_FORTRAN_INTERFACES', 'fortran'),
+            self.define_from_variant('AMReX_EB', 'eb'),
+            self.define_from_variant('AMReX_LINEAR_SOLVERS',
+                                     'linear_solvers'),
+            self.define_from_variant('AMReX_AMRDATA', 'amrdata'),
+            self.define_from_variant('AMReX_PARTICLES', 'particles'),
+            self.define_from_variant('AMReX_PIC', 'pic'),
+            self.define_from_variant('AMReX_HDF5', 'hdf5'),
+            self.define_from_variant('AMReX_HYPRE', 'hypre'),
+            self.define_from_variant('AMReX_PETSC', 'petsc'),
+        ]
+
+        if self.spec.satisfies('%fj'):
+            args.append('-DCMAKE_Fortran_MODDIR_FLAG=-M')
+
+        if '+cuda' in self.spec:
+            args.append('-DAMReX_GPU_BACKEND=CUDA')
+            args.append('-DAMReX_CUDA_ERROR_CAPTURE_THIS=ON')
+            args.append('-DAMReX_CUDA_ERROR_CROSS_EXECUTION_SPACE_CALL=ON')
+            cuda_arch = self.spec.variants['cuda_arch'].value
+            args.append('-DCUDA_ARCH=' + self.get_cuda_arch_string(cuda_arch))
+
+        if '+rocm' in self.spec:
+            args.append('-DCMAKE_CXX_COMPILER={0}'.format(self.spec['hip'].hipcc))
+            args.append('-DAMReX_GPU_BACKEND=HIP')
+            targets = self.spec.variants['amdgpu_target'].value
+            args.append('-DAMReX_AMD_ARCH=' + ';'.join(str(x) for x in targets))
+
+        return args
+    
+    #
     # For versions <= 20.11
     #
     @when('@:20.11')
@@ -167,45 +214,3 @@ class Amrex(CMakePackage, CudaPackage, ROCmPackage):
 
         return args
 
-    #
-    # For versions > 20.11
-    #
-    @when('@20.12:')
-    def cmake_args(self):
-        args = [
-            '-DUSE_XSDK_DEFAULTS=ON',
-            self.define_from_variant('AMReX_SPACEDIM', 'dimensions'),
-            self.define_from_variant('BUILD_SHARED_LIBS', 'shared'),
-            self.define_from_variant('AMReX_MPI', 'mpi'),
-            self.define_from_variant('AMReX_OMP', 'openmp'),
-            '-DXSDK_PRECISION:STRING=%s' %
-            self.spec.variants['precision'].value.upper(),
-            self.define_from_variant('XSDK_ENABLE_Fortran', 'fortran'),
-            self.define_from_variant('AMReX_FORTRAN_INTERFACES', 'fortran'),
-            self.define_from_variant('AMReX_EB', 'eb'),
-            self.define_from_variant('AMReX_LINEAR_SOLVERS',
-                                     'linear_solvers'),
-            self.define_from_variant('AMReX_AMRDATA', 'amrdata'),
-            self.define_from_variant('AMReX_PARTICLES', 'particles'),
-            self.define_from_variant('AMReX_HDF5', 'hdf5'),
-            self.define_from_variant('AMReX_HYPRE', 'hypre'),
-            self.define_from_variant('AMReX_PETSC', 'petsc'),
-        ]
-
-        if self.spec.satisfies('%fj'):
-            args.append('-DCMAKE_Fortran_MODDIR_FLAG=-M')
-
-        if '+cuda' in self.spec:
-            args.append('-DAMReX_GPU_BACKEND=CUDA')
-            args.append('-DAMReX_CUDA_ERROR_CAPTURE_THIS=ON')
-            args.append('-DAMReX_CUDA_ERROR_CROSS_EXECUTION_SPACE_CALL=ON')
-            cuda_arch = self.spec.variants['cuda_arch'].value
-            args.append('-DCUDA_ARCH=' + self.get_cuda_arch_string(cuda_arch))
-
-        if '+rocm' in self.spec:
-            args.append('-DCMAKE_CXX_COMPILER={0}'.format(self.spec['hip'].hipcc))
-            args.append('-DAMReX_GPU_BACKEND=HIP')
-            targets = self.spec.variants['amdgpu_target'].value
-            args.append('-DAMReX_AMD_ARCH=' + ';'.join(str(x) for x in targets))
-
-        return args
