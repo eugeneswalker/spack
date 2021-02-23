@@ -54,7 +54,10 @@ class AmrWind(CMakePackage, CudaPackage):
     depends_on('mpi', when='+mpi')
     
     for opt in process_amrex_constraints():
-        depends_on('amrex'+opt+'@20.12:', when='~internal-amrex'+opt)
+        dopt = '+particles' + opt
+        if '+hypre' in dopt:
+            dopt = "+fortran" + dopt
+        depends_on('amrex@develop'+dopt, when='~internal-amrex'+opt)
 
     depends_on('hypre+mpi+int64~cuda@2.20.0:', when='+mpi~cuda+hypre')
     depends_on('hypre~mpi+int64~cuda@2.20.0:', when='~mpi~cuda+hypre')
@@ -66,24 +69,6 @@ class AmrWind(CMakePackage, CudaPackage):
     depends_on('netcdf-c', when='+netcdf')
     depends_on('masa', when='+masa')
     depends_on('openfast+cxx', when='+openfast')
-
-    def process_cuda_args(self):
-        """Process CUDA arch spec and convert it to AMReX format"""
-        amrex_arch_map = {'20': '2.0', '21': '2.1', '30': '3.0', '32': '3.2',
-                          '35': '3.5', '37': '3.7', '50': '5.0', '52': '5.2',
-                          '53': '5.3', '60': '6.0', '61': '6.1', '62': '6.2',
-                          '70': '7.0', '72': '7.2', '75': '7.5', '80': '8.0',
-                          '86': '8.6'}
-
-        cuda_arch = self.spec.variants['cuda_arch'].value
-        try:
-            amrex_arch = []
-            for vv in cuda_arch:
-                if vv in amrex_arch_map:
-                    amrex_arch.append(amrex_arch_map[vv])
-            return amrex_arch
-        except:
-            return []
 
     def cmake_args(self):
         define = CMakePackage.define
@@ -104,11 +89,10 @@ class AmrWind(CMakePackage, CudaPackage):
         ]
 
         if '+cuda' in self.spec:
-            #amrex_arch = self.process_cuda_args()
             amrex_arch = ';'.join('{0:.1f}'.format(float(i) / 10.0) 
                     for i in self.spec.variants['cuda_arch'].value) 
             if amrex_arch:
-                args.append(define('AMReX_CUDA_ARCH', ';'.join(amrex_arch)))
+                args.append(define('AMReX_CUDA_ARCH', amrex_arch))
 
         if '+internal-amrex' in self.spec:
             args.append(self.define('AMR_WIND_USE_INTERNAL_AMREX', True))
