@@ -104,7 +104,9 @@ class AmrWind(CMakePackage, CudaPackage):
         ]
 
         if '+cuda' in self.spec:
-            amrex_arch = self.process_cuda_args()
+            #amrex_arch = self.process_cuda_args()
+            amrex_arch = ';'.join('{0:.1f}'.format(float(i) / 10.0) 
+                    for i in self.spec.variants['cuda_arch'].value) 
             if amrex_arch:
                 args.append(define('AMReX_CUDA_ARCH', ';'.join(amrex_arch)))
 
