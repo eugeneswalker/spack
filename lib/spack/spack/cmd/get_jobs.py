@@ -122,9 +122,15 @@ def get_jobs(parser, args, **kwargs):
 
       try:
         if bindist.needs_rebuild(s, mirror_url, True):
+          print("\n\nNeed rebuild 1: {} {}\n\n".format(s, h))
+          print(s.to_yaml(hash=ht.build_hash))
+          print("\n\n")
           spec_hashes_rebuild.append(h)
           continue
       except Exception as e:
+        print("\n\nNeed rebuild 2: {} {}\n\n".format(s, h))
+        print(s.to_yaml(hash=ht.build_hash))
+        print("\n\n")
         spec_hashes_rebuild.append(h)
         continue
 
