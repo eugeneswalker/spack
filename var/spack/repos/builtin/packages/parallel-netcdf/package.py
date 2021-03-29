@@ -51,6 +51,7 @@ class ParallelNetcdf(AutotoolsPackage):
 
     depends_on('mpi')
 
+    depends_on('libpciaccess', type='link')
     depends_on('m4', type='build')
     depends_on('autoconf', when='@master', type='build')
     depends_on('automake', when='@master', type='build')
