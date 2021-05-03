@@ -122,15 +122,15 @@ def get_jobs(parser, args, **kwargs):
 
       try:
         if bindist.needs_rebuild(s, mirror_url, True):
-          print("\n\nNeed rebuild 1: {} {}\n\n".format(s, h))
-          print(s.to_yaml(hash=ht.build_hash))
-          print("\n\n")
+          # print("\n\nNeed rebuild 1: {} {}\n\n".format(s, h))
+          # print(s.to_yaml(hash=ht.build_hash))
+          # print("\n\n")
           spec_hashes_rebuild.append(h)
           continue
       except Exception as e:
-        print("\n\nNeed rebuild 2: {} {}\n\n".format(s, h))
-        print(s.to_yaml(hash=ht.build_hash))
-        print("\n\n")
+        # print("\n\nNeed rebuild 2: {} {}\n\n".format(s, h))
+        # print(s.to_yaml(hash=ht.build_hash))
+        # print("\n\n")
         spec_hashes_rebuild.append(h)
         continue
 
@@ -162,10 +162,10 @@ def get_jobs(parser, args, **kwargs):
       fs.write(json.dumps(j, indent=1))
 
   def job_name(s):
-    return "{}@{}%{}-{} {}".format(s.name, s.version, s.compiler, s.dag_hash()[:6], s.architecture)
+    return "{}@{}%{}-{} {}".format(s.name, s.version, s.compiler, s.full_hash()[:6], s.architecture)
 
   def job_name_brief(s):
-    return "{}-{}".format(s.name, s.dag_hash()[:6])
+    return "{}-{}".format(s.name, s.full_hash()[:6])
   
   def spec_filename(s):
     return "{}.spec.yaml".format(job_name_brief(s))
