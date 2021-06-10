@@ -316,20 +316,10 @@ class Tau(Package):
                     os.symlink(join_path(subdir, d), dest)
 
     def fix_tau_compilers(self):
-        filter_file('FULL_CC=' + spack_cc, 'FULL_CC=' + self.compiler.cc,
-                    self.prefix + '/include/Makefile', backup=False,
-                    string=True)
-        filter_file('FULL_CXX=' + spack_cxx, 'FULL_CXX=' +
-                    self.compiler.cxx, self.prefix + '/include/Makefile',
-                    backup=False, string=True)
+        filter_compiler_wrappers('Makefile', relative_root=self.prefix.include)
         for makefile in os.listdir(self.prefix.lib):
             if makefile.startswith('Makefile.tau'):
-                filter_file('FULL_CC=' + spack_cc, 'FULL_CC=' +
-                            self.compiler.cc, self.prefix.lib + "/" +
-                            makefile, backup=False, string=True)
-                filter_file('FULL_CXX=' + spack_cxx, 'FULL_CXX=' +
-                            self.compiler.cxx, self.prefix.lib +
-                            "/" + makefile, backup=False, string=True)
+                filter_compiler_wrappers(makefile, relative_root=self.prefix.lib)
 
     def setup_run_environment(self, env):
         pattern = join_path(self.prefix.lib, 'Makefile.*')
