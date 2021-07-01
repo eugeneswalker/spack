@@ -487,8 +487,12 @@ class PickKeyException(spack.error.SpackError):
     """
 
     def __init__(self, keys):
-        err_msg = "Multiple keys available for signing\n%s\n" % keys
-        err_msg += "Use spack buildcache create -k <key hash> to pick a key."
+        err_msg = "Multiple keys available for signing\n---\n"
+        for k in keys:
+            err_msg += "* {0} :: {1}\n".format(k.uid, k.fingerprint)
+        err_msg += "---\n"
+        err_msg += "Use spack buildcache create -k <ID> to pick a key.\n"
+        err_msg += "<ID> should be the fingerprint or user-id associated with the key. It cannot be ambiguous.\n"
         super(PickKeyException, self).__init__(err_msg)
 
 
@@ -678,20 +682,25 @@ def checksum_tarball(file):
 
 
 def select_signing_key(key=None):
-    if key is None:
+    keys = []
+    if key:
+        keys = spack.util.gpg.signing_keys(key)
+    else:
         keys = spack.util.gpg.signing_keys()
-        if len(keys) == 1:
-            key = keys[0]
 
-        if len(keys) > 1:
-            raise PickKeyException(str(keys))
-
-        if len(keys) == 0:
+    if len(keys) <= 0:
+        if key:
+            raise NoKeyException("Signing key not found: {0}".format(key))
+        else:
             raise NoKeyException(
                 "No default key available for signing.\n"
                 "Use spack gpg init and spack gpg create"
                 " to create a default key.")
-    return key
+
+    elif len(keys) == 1:
+        return keys[0]
+
+    raise PickKeyException(keys)
 
 
 def sign_tarball(key, force, specfile_path):
@@ -701,8 +710,9 @@ def sign_tarball(key, force, specfile_path):
         else:
             raise NoOverwriteException('%s.asc' % specfile_path)
 
-    key = select_signing_key(key)
-    spack.util.gpg.sign(key, specfile_path, '%s.asc' % specfile_path)
+    #print("KEY = {}".format(key), flush=True)
+    #key = select_signing_key(key)
+    spack.util.gpg.sign(key.fingerprint, specfile_path, '%s.asc' % specfile_path)
 
 
 def generate_package_index(cache_prefix):
@@ -995,6 +1005,7 @@ def build_tarball(spec, outdir, force=False, rel=False, unsigned=False,
         # push the key to the build cache's _pgp directory so it can be
         # imported
         if not unsigned:
+            # print("KEY = {}".format(key))
             push_keys(outdir,
                       keys=[key],
                       regenerate_index=regenerate_index,
@@ -1527,7 +1538,9 @@ def push_keys(*mirrors, **kwargs):
     tmpdir = kwargs.get('tmpdir')
     remove_tmpdir = False
 
-    keys = spack.util.gpg.public_keys(*(keys or []))
+    # print("type(KEY) = {}".format(type(keys)))
+    # print("KEYS = ", keys)
+    keys = spack.util.gpg.public_keys(*([k.fingerprint for k in keys]))
 
     try:
         for mirror in mirrors:

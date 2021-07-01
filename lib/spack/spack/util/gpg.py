@@ -12,6 +12,7 @@ import spack.error
 import spack.paths
 import spack.util.executable
 import spack.version
+import llnl.util.tty as tty
 
 
 #: Executable instance for "gpg", initialized lazily
@@ -23,6 +24,14 @@ SOCKET_DIR = None
 #: GNUPGHOME environment variable in the context of this Python module
 GNUPGHOME = None
 
+
+class GPGKey:
+    def __init__(self, id, fingerprint="", uid=""):
+        self.id = id
+        self.fingerprint = fingerprint
+        self.uid = uid
+    def __str__(self):
+        return self.fingerprint
 
 def clear():
     """Reset the global state to uninitialized."""
@@ -119,17 +128,30 @@ def gnupghome_override(dir):
 
 
 def _parse_secret_keys_output(output):
+    lines = output.split('\n')[:-1]
+    keyStartIndices = [i for i, l in enumerate(lines) if l.startswith('sec')]
     keys = []
-    found_sec = False
-    for line in output.split('\n'):
-        if found_sec:
-            if line.startswith('fpr'):
-                keys.append(line.split(':')[9])
-                found_sec = False
-            elif line.startswith('ssb'):
-                found_sec = False
-        elif line.startswith('sec'):
-            found_sec = True
+    for n, i in enumerate(keyStartIndices):
+        keylines = []
+        if n < len(keyStartIndices)-1:
+            keylines = lines[i:keyStartIndices[n+1]]
+        else:
+            keylines = lines[i:]
+
+        kid = ""
+        fpr = ""
+        uid = ""
+        for l in keylines:
+            fields = l.split(':')
+            if l.startswith('fpr'):
+                fpr = fields[9]
+            elif l.startswith('uid'):
+                uid = fields[9]
+            elif l.startswith('sec'):
+                kid = fields[4]
+
+        keys.append(GPGKey(kid, fingerprint=fpr, uid=uid))
+
     return keys
 
 
@@ -177,7 +199,7 @@ def signing_keys(*args):
     """Return the keys that can be used to sign binaries."""
     output = GPG(
         '--list-secret-keys', '--with-colons', '--fingerprint',
-        *args, output=str
+        *args, output=str, error=str
     )
     return _parse_secret_keys_output(output)
 
@@ -246,7 +268,7 @@ def sign(key, file, output, clearsign=False):
             signature, if False creates a detached signature
     """
     signopt = '--clearsign' if clearsign else '--detach-sign'
-    GPG(signopt, '--armor', '--default-key', key, '--output', output, file)
+    GPG(signopt, '--armor', '--default-key', key, '--output', output, file, output=str, error=str)
 
 
 @_autoinit
@@ -260,7 +282,7 @@ def verify(signature, file, suppress_warnings=False):
             from GnuPG
     """
     kwargs = {'error': str} if suppress_warnings else {}
-    GPG('--verify', signature, file, **kwargs)
+    GPG('--verify', signature, file, output=str, error=str)
 
 
 @_autoinit
@@ -289,7 +311,7 @@ def _verify_exe_or_raise(exe):
     if not exe:
         raise SpackGPGError(msg)
 
-    output = exe('--version', output=str)
+    output = exe('--version', output=str, error=str)
     match = re.search(r"^gpg(conf)? \(GnuPG\) (.*)$", output, re.M)
     if not match:
         raise SpackGPGError(
@@ -305,8 +327,9 @@ def _gpgconf():
     _verify_exe_or_raise(exe)
 
     # ensure that the gpgconf we found can run "gpgconf --create-socketdir"
+    output = None
     try:
-        exe('--dry-run', '--create-socketdir')
+        exe('--dry-run', '--create-socketdir', error=os.devnull)
     except spack.util.executable.ProcessError:
         # no dice
         exe = None
