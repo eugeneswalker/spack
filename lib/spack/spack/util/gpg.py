@@ -12,6 +12,7 @@ import spack.error
 import spack.paths
 import spack.util.executable
 import spack.version
+import llnl.util.tty as tty
 
 
 #: Executable instance for "gpg", initialized lazily
@@ -120,16 +121,10 @@ def gnupghome_override(dir):
 
 def _parse_secret_keys_output(output):
     keys = []
-    found_sec = False
     for line in output.split('\n'):
-        if found_sec:
-            if line.startswith('fpr'):
-                keys.append(line.split(':')[9])
-                found_sec = False
-            elif line.startswith('ssb'):
-                found_sec = False
-        elif line.startswith('sec'):
-            found_sec = True
+        if line.startswith('sec'):
+            id = line.split(':')[4]
+            keys.append(id)
     return keys
 
 

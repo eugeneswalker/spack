@@ -678,20 +678,25 @@ def checksum_tarball(file):
 
 
 def select_signing_key(key=None):
-    if key is None:
+    keys = []
+    if key:
+        keys = spack.util.gpg.signing_keys(key)
+    else:
         keys = spack.util.gpg.signing_keys()
-        if len(keys) == 1:
-            key = keys[0]
 
-        if len(keys) > 1:
-            raise PickKeyException(str(keys))
-
-        if len(keys) == 0:
+    if len(keys) <= 0:
+        if key:
+            raise NoKeyException("Signing key not found: {0}".format(key))
+        else:
             raise NoKeyException(
                 "No default key available for signing.\n"
                 "Use spack gpg init and spack gpg create"
                 " to create a default key.")
-    return key
+
+    elif len(keys) == 1:
+        return keys[0]
+
+    raise PickKeyException(str(keys))
 
 
 def sign_tarball(key, force, specfile_path):
