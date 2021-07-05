@@ -487,8 +487,14 @@ class PickKeyException(spack.error.SpackError):
     """
 
     def __init__(self, keys):
-        err_msg = "Multiple keys available for signing\n%s\n" % keys
-        err_msg += "Use spack buildcache create -k <key hash> to pick a key."
+        err_msg = "Multiple keys available for signing\n---"
+        for k in keys:
+            err_msg += "\n"
+            err_msg += "User-ID: {0}\n".format(k.uid)
+            err_msg += "Fingerprint: {0}\n".format(k.fingerprint)
+        err_msg += "---\n"
+        err_msg += "Specify your key choice unambiguously using `--key <ID>`. "
+        err_msg += "<ID> can be the fingerprint or user-id.\n"
         super(PickKeyException, self).__init__(err_msg)
 
 
@@ -678,20 +684,25 @@ def checksum_tarball(file):
 
 
 def select_signing_key(key=None):
-    if key is None:
+    keys = []
+    if key:
+        keys = spack.util.gpg.signing_keys(key)
+    else:
         keys = spack.util.gpg.signing_keys()
-        if len(keys) == 1:
-            key = keys[0]
 
-        if len(keys) > 1:
-            raise PickKeyException(str(keys))
-
-        if len(keys) == 0:
+    if len(keys) <= 0:
+        if key:
+            raise NoKeyException("Signing key not found: {0}".format(key))
+        else:
             raise NoKeyException(
                 "No default key available for signing.\n"
                 "Use spack gpg init and spack gpg create"
                 " to create a default key.")
-    return key
+
+    elif len(keys) == 1:
+        return keys[0].fingerprint
+
+    raise PickKeyException(keys)
 
 
 def sign_tarball(key, force, specfile_path):
