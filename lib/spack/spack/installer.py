@@ -543,7 +543,7 @@ def log(pkg):
         fs.install(phase_log, log_file)
 
     # Archive the environment used for the build
-    fs.install(pkg.env_path, pkg.install_env_path)
+    #fs.install(pkg.env_path, pkg.install_env_path)
 
     if os.path.exists(pkg.configure_args_path):
         # Archive the args used for the build
