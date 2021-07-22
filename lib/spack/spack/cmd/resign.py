@@ -103,15 +103,18 @@ def debug(*args, **kwargs):
 
 def worker_gpghome(src, tmpdir):
     dst = None
-    while not dst:
+    for _ in range(5):
         dst = os.path.join(tmpdir, ".gnupg-{0}".format(random_string(10)))
-        if os.path.exists(dst):
+        if not os.path.exists(dst):
+            break
+        else:
             dst = None
+    if not dst:
+        raise
 
     os.makedirs(dst, exist_ok=True)
 
-    fs = ['pubring.kbx', 'trustdb.gpg']
-    for f in fs:
+    for f in ['pubring.kbx', 'trustdb.gpg']:
         sf = os.path.join(src, f)
         df = os.path.join(dst, f)
         shutil.copyfile(sf, df)
@@ -295,10 +298,14 @@ def resign(parser, args, **kwargs):
         return 0
 
     uniqdir = None
-    while True:
-        uniqdir = os.path.join(workdir, "-{0}".format(random_string(10)))
-        if not os.path.exists(uniqdir):
+    for i in range(5):
+        d = os.path.join(workdir, "spack-resign-{0}".format(random_string(10)))
+        if not os.path.exists(d):
+            uniqdir = d
             break
+    if uniqdir is None:
+        tty.error("Could not create unique work dir under {0}".format(workdir))
+        return 1
     workdir = uniqdir
 
     random.shuffle(archives)
@@ -327,7 +334,9 @@ def resign(parser, args, **kwargs):
     q = Queue() if progress else None
     procs = []
     for i in range(np):
+        debug("WORKDIR {0} = {1}".format(i,workdir))
         gpgdir = worker_gpghome(gpg.GNUPGHOME, workdir)
+        debug("GPGHOME {0} = {1}".format(i,gpgdir))
         work = archive_chunks[i]
         p = Process(target=resign_worker, args=(workdir, key, work, strip, gpgdir, q))
         p.start()
@@ -341,9 +350,8 @@ def resign(parser, args, **kwargs):
     cnt = 0
     while cnt < np:
         for p in procs:
-            if p.is_alive():
-                continue
-            cnt += 1
+            if not p.is_alive():
+                cnt += 1
         time.sleep(0.2)
 
     debug("DONE!")
