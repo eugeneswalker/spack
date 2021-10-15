@@ -90,6 +90,10 @@ configuration_defaults_path = (
 )
 
 #: Builtin paths to configuration files in Spack
+# Allow a system config scope that does not require root privileges:
+_system_config_scope = os.getenv('SPACK_SYSTEM_CONFIG_PATH')
+if not _system_config_scope:
+    _system_config_scope = os.path.join(spack.paths.system_etc_path, 'spack')
 configuration_paths = (
     # Default configuration scope is the lowest-level scope. These are
     # versioned with Spack and can be overridden by systems, sites or users
@@ -97,7 +101,8 @@ configuration_paths = (
 
     # System configuration is per machine.
     # No system-level configs should be checked into spack by default
-    ('system', os.path.join(spack.paths.system_etc_path, 'spack')),
+    #('system', os.path.join(spack.paths.system_etc_path, 'spack')),
+    ('system', _system_config_scope),
 
     # Site configuration is per spack instance, for sites or projects
     # No site-level configs should be checked into spack by default.
