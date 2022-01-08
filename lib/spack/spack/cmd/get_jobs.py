@@ -9,14 +9,9 @@ import os
 import copy
 import json
 from itertools import chain
+import multiprocessing
 
 def setup_parser(subparser):
-  subparser.add_argument(
-    '--job-map',
-    dest='job_map',
-    required=False,
-    default="",
-    help="""file to dump job-map to""") 
   subparser.add_argument(
     '--globalvar',
     dest='global_vars',
@@ -47,6 +42,16 @@ description = "generate a build manifest containing each spack job needed to ins
 section = "build"
 level = "short"
 
+def is_rebuild_required(o):
+  h, s, m = o
+  need_rebuild = False
+  try:
+    if bindist.needs_rebuild(s["spec"], m, True):
+      need_rebuild = True
+  except Exception as e:
+    need_rebuild = True
+  return (h, need_rebuild)
+
 def get_jobs(parser, args, **kwargs):
   global_vars = {}
   if args.global_vars:
@@ -64,33 +69,42 @@ def get_jobs(parser, args, **kwargs):
 
   with spack.concretize.disable_compiler_existence_check():
     e.concretize()
-  css = [cs for (us,cs) in e.concretized_specs()]
-  all_specs = {}  
 
-  for cs in css:
+  all_specs = {}
+
+  root_spec_hashes = {
+    cs.dag_hash(): abspec for (abspec, cs) in e.concretized_specs()
+  }
+  
+  for (_, cs) in e.concretized_specs():
+    
     for s in cs.traverse_edges(deptype=blr, direction="children", cover="nodes", order="pre"):
-      h = s.spec.full_hash()
-      if h not in all_specs:
-        all_specs[h] = {
-          "spec": s.spec, 
-          "dependency_hashes": [], 
-          "dependent_hashes": [],
-          "is_root": s.spec.dag_hash() == cs.dag_hash()
-        }
+      h = s.spec.dag_hash()
+
+      is_root = h in root_spec_hashes
+      abspec = root_spec_hashes[h] if h in root_spec_hashes else ""
+
+      all_specs[h] = {
+        "spec": s.spec, 
+        "dependency_hashes": [], 
+        "dependent_hashes": [],
+        "is_root": is_root,
+        "abstract_spec": abspec
+      }
       
-        q = list(s.spec.dependencies(deptype=blr))
-        while len(q) > 0:
-          s2 = q.pop(0)
-          all_specs[h]["dependency_hashes"].append(s2.full_hash())
-          q += list(s2.dependencies(deptype=blr))
-        all_specs[h]["dependency_hashes"] = list(set(all_specs[h]["dependency_hashes"]))
+      q = list(s.spec.dependencies(deptype=blr))
+      while len(q) > 0:
+        s2 = q.pop(0)
+        all_specs[h]["dependency_hashes"].append(s2.dag_hash())
+        q += list(s2.dependencies(deptype=blr))
+      all_specs[h]["dependency_hashes"] = list(set(all_specs[h]["dependency_hashes"]))
         
-        q = list(s.spec.dependents(deptype=blr))
-        while len(q) > 0:
-          s2 = q.pop(0)
-          all_specs[h]["dependent_hashes"].append(s2.full_hash())
-          q += list(s2.dependents(deptype=blr))
-        all_specs[h]["dependent_hashes"] = list(set(all_specs[h]["dependent_hashes"]))
+      q = list(s.spec.dependents(deptype=blr))
+      while len(q) > 0:
+        s2 = q.pop(0)
+        all_specs[h]["dependent_hashes"].append(s2.dag_hash())
+        q += list(s2.dependents(deptype=blr))
+      all_specs[h]["dependent_hashes"] = list(set(all_specs[h]["dependent_hashes"]))
   
   # accumulate dependents + dependencies
   for rh, ro in all_specs.items():
@@ -116,27 +130,19 @@ def get_jobs(parser, args, **kwargs):
   tty._msg_enabled = False
   tty._error_enabled = False
   tty._warn_enabled = False
-  if mirror_url:
-    for h, o in all_specs.items():
-      s = o["spec"]
 
-      try:
-        if bindist.needs_rebuild(s, mirror_url, True):
-          # print("\n\nNeed rebuild 1: {} {}\n\n".format(s, h))
-          # print(s.to_yaml(hash=ht.build_hash))
-          # print("\n\n")
-          spec_hashes_rebuild.append(h)
-          continue
-      except Exception as e:
-        # print("\n\nNeed rebuild 2: {} {}\n\n".format(s, h))
-        # print(s.to_yaml(hash=ht.build_hash))
-        # print("\n\n")
+  if mirror_url:
+    jobs = [(h, o, mirror_url) for h, o in all_specs.items()]
+    pool = multiprocessing.Pool(multiprocessing.cpu_count())
+    results = pool.map(is_rebuild_required, jobs)
+    pool.close()
+    pool.join()
+    for (h, needs_rebuild) in results:
+      if needs_rebuild:
         spec_hashes_rebuild.append(h)
         continue
-
-      # if here, spec does not need rebuild
-      for dh in o["dependent_hashes"]:
-        all_specs[dh]["dependency_hashes"].remove(h)
+      for dh in all_specs[h]["dependent_hashes"]:
+        all_specs[dh]["dependency_hashes"].remove(h) 
   else:
     spec_hashes_rebuild = spec_hashes
 
@@ -144,34 +150,14 @@ def get_jobs(parser, args, **kwargs):
     print("No specs need rebuilding!")
     return 0
 
-  job_map_file = args.job_map.strip()
-  if len(job_map_file) > 0:
-    j = {}
-    for k in spec_hashes_rebuild:
-      v = all_specs[k]
-      nv = {
-        "hash": k,
-        "dependencies": v['dependency_hashes'],
-        "dependents": v['dependent_hashes'],
-        "name": v['spec'].name,
-        "yaml": v['spec'].to_yaml(hash=ht.build_hash)
-      }
-      j[k] = nv
-
-    with open(job_map_file, 'w') as fs:
-      fs.write(json.dumps(j, indent=1))
-
   def job_name(s):
-    return "{}@{}%{}-{} {}".format(s.name, s.version, s.compiler, s.full_hash()[:6], s.architecture)
+    return "{}@{}%{}-{} {}".format(s.name, s.version, s.compiler, s.dag_hash(7), s.architecture)
 
   def job_name_brief(s):
-    return "{}-{}".format(s.name, s.full_hash()[:6])
+    return "{}-{}".format(s.name, s.dag_hash(7))
   
   def spec_filename(s):
-    return "{}.spec.yaml".format(job_name_brief(s))
-
-  def spec_name(s):
-    return "{}".format(s.name)
+    return "{}.spec.json".format(job_name_brief(s))
 
   def ndeps(h):
     return len(aspecs[h]["dependency_hashes"])
@@ -219,7 +205,7 @@ def get_jobs(parser, args, **kwargs):
     this_stage = []
 
   y = {
-    "stages": [i for i in range(len(spec_stages))],
+    "stages": list(range(len(spec_stages))),
     "spack_ref": args.spack_ref,
     "variables": {k:v for k, v in global_vars.items()},
     "jobs": {}
@@ -232,15 +218,29 @@ def get_jobs(parser, args, **kwargs):
       needs = [job_name(all_specs[dh]["spec"]) for dh in all_specs[h]["dependency_hashes"]]
       y["jobs"][job] = {
         "stage": stage_i,
-        "spec_name": spec_name(s),
+        "spec_name": s.name,
         "is_root": is_root,
-        #"spec_yaml": "{}".format(s.to_yaml(hash=ht.build_hash)),
         "spec_file": spec_filename(s),
-        "dag_hash": s.dag_hash()[:6],
+        "dag_hash": s.dag_hash(),
         "full_hash": s.full_hash(),
-        "build_hash": s.build_hash()[:6],
-        "needs": needs
+        "build_hash": s.build_hash(),
+        "needs": needs,
+        "is_root": is_root
       }
+
+      if is_root:
+        s = all_specs[h]["spec"]
+        abspec = all_specs[h]["abstract_spec"]
+        container_name = "{}-{}".format(s.name, s.version)
+        if "+cuda" in abspec:
+          container_name += "-cuda"
+        if "+rocm" in abspec or "+hip" in abspec:
+          container_name += "-rocm"
+        container_name += "-{}".format(s.dag_hash(7))
+        y["jobs"][job]["variables"] = {
+          "CONTAINER_NAME": container_name,
+          "ABSTRACT_SPEC": str(abspec)
+        }
 
   basename = os.path.basename(args.output)
   dirname = os.path.dirname(args.output)
@@ -254,7 +254,7 @@ def get_jobs(parser, args, **kwargs):
   with open(output_path, "w") as fs:
     fs.write(json.dumps(y, indent=1))
   
-  # write .spec.yaml files
+  # write spec files
   specs_dir_basename = "specs"
   specs_dir = os.path.abspath(os.path.join(dirname, specs_dir_basename))
   os.makedirs(specs_dir, exist_ok=True)
@@ -262,9 +262,8 @@ def get_jobs(parser, args, **kwargs):
   ss = list(chain.from_iterable(spec_stages))
   for h in ss:
     s = all_specs[h]["spec"]
-    y = s.to_yaml(hash=ht.build_hash) 
-    yp = os.path.join(specs_dir, spec_filename(s))
-    with open(yp, 'w') as fs:
-      fs.write(y)
+    f = os.path.join(specs_dir, spec_filename(s))
+    with open(f, 'w') as fs:
+      fs.write(s.to_json(hash=ht.build_hash) )
 
   return 0
