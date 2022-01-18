@@ -224,9 +224,17 @@ def get_jobs(parser, args, **kwargs):
         "dag_hash": s.dag_hash(),
         "full_hash": s.full_hash(),
         "build_hash": s.build_hash(),
-        "needs": needs,
-        "is_root": is_root
+        "needs": needs
       }
+
+      gpu = "none"
+      abspec = all_specs[h]["abstract_spec"]
+      if "+cuda" in abspec:
+        gpu = "cuda"
+      if "+rocm" in abspec or "+hip" in abspec:
+        gpu = "rocm"
+      
+      y["jobs"][job]["gpu"] = gpu
 
       if is_root:
         s = all_specs[h]["spec"]
