@@ -244,7 +244,7 @@ def get_jobs(parser, args, **kwargs):
           container_name += "-cuda"
         if "+rocm" in abspec or "+hip" in abspec:
           container_name += "-rocm"
-        container_name += "-{}".format(s.dag_hash(7))
+        container_name += "-{}-{}".format(s.dag_hash(7), s.full_hash(7))
         y["jobs"][job]["variables"] = {
           "CONTAINER_NAME": container_name,
           "ABSTRACT_SPEC": str(abspec)
