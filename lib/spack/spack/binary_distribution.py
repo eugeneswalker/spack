@@ -1256,7 +1256,7 @@ def download_tarball(spec, preferred_mirrors=None):
             stage.fetch()
             return stage.save_filename
         except fs.FetchError:
-            tty.warn("FETCH ERROR")
+            tty.warn("FETCH ERROR: {}".format(try_url))
             continue
 
     tty.warn("download_tarball() was unable to download " +
