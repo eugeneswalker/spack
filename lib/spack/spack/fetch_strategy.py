@@ -367,8 +367,10 @@ class URLFetchStrategy(FetchStrategy):
 
     def _fetch_from_url(self, url):
         if spack.config.get('config:url_fetch_method') == 'curl':
+            tty.msg("FETCH CURL")
             return self._fetch_curl(url)
         else:
+            tty.msg("FETCH URLLIB")
             return self._fetch_urllib(url)
 
     def _check_headers(self, headers):
