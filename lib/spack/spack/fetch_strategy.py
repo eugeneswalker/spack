@@ -325,7 +325,7 @@ class URLFetchStrategy(FetchStrategy):
         for url in self.candidate_urls:
             if not self._existing_url(url):
                 continue
-
+            tty.msg("FETCH EXISTS, TRYING DOWNLOAD: {}".format(url))
             try:
                 partial_file, save_file = self._fetch_from_url(url)
                 if save_file and (partial_file is not None):
