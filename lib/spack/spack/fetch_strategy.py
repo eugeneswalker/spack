@@ -332,12 +332,13 @@ class URLFetchStrategy(FetchStrategy):
                     llnl.util.filesystem.rename(partial_file, save_file)
                 break
             except FailedDownloadError as e:
-                errors.append(str(e))
+                errors.append("1111 {}".format(str(e)))
 
         for msg in errors:
             tty.debug(msg)
 
         if not self.archive_file:
+            tty.msg("22222")
             raise FailedDownloadError(url)
 
     def _existing_url(self, url):
