@@ -330,6 +330,7 @@ class URLFetchStrategy(FetchStrategy):
                 partial_file, save_file = self._fetch_from_url(url)
                 if save_file and (partial_file is not None):
                     llnl.util.filesystem.rename(partial_file, save_file)
+                tty.msg("SUCCESSFUL SAVE")
                 break
             except FailedDownloadError as e:
                 tty.msg("1111")
