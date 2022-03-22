@@ -1249,7 +1249,9 @@ def download_tarball(spec, preferred_mirrors=None):
     for try_url in urls_to_try:
         # stage the tarball into standard place
         stage = Stage(try_url, name="build_cache", keep=True)
+        tty.msg("STAGE DIR 1 = {}".format(stage.path))
         stage.create()
+        tty.msg("STAGE DIR 2 = {}".format(stage.path))
         try:
             stage.fetch()
             return stage.save_filename
