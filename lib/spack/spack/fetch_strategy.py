@@ -332,6 +332,7 @@ class URLFetchStrategy(FetchStrategy):
                     llnl.util.filesystem.rename(partial_file, save_file)
                 break
             except FailedDownloadError as e:
+                tty.msg("1111")
                 errors.append("1111 {}".format(str(e)))
 
         for msg in errors:
