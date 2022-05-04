@@ -8,7 +8,7 @@ import llnl.util.tty as tty
 from spack import *
 
 
-class Hpctoolkit(AutotoolsPackage):
+class Hpctoolkit(AutotoolsPackage, CudaPackage, ROCmPackage):
     """HPCToolkit is an integrated suite of tools for measurement and analysis
     of program performance on computers ranging from multicore desktop systems
     to the nation's largest supercomputers. By using statistical sampling of
@@ -63,12 +63,6 @@ class Hpctoolkit(AutotoolsPackage):
     variant('all-static', default=False,
             description='Needed when MPICXX builds static binaries '
             'for the compute nodes.')
-
-    variant('cuda', default=False,
-            description='Support CUDA on NVIDIA GPUs (2020.03.01 or later).')
-
-    variant('rocm', default=False,
-            description='Support ROCM on AMD GPUs (2022.04.15 or later).')
 
     variant('debug', default=False,
             description='Build in debug (develop) mode.')
