@@ -94,6 +94,9 @@ class Ascent(CMakePackage, CudaPackage):
     ##########################################################################
     # patches
     ###########################################################################
+    # https://github.com/spack/spack/issues/31846#issuecomment-1208274062
+    patch("cloverleaf3d-oneapi.patch", when="@0.8.0 %oneapi")
+
     # patch for gcc 10 and 11, changes already on develop, here
     # so folks can build 0.7.1 with those compilers
     patch("ascent-gcc-11-pr753.patch", when="@0.7.1")

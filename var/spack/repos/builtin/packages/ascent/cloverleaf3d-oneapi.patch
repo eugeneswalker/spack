@@ -1,0 +1,17 @@
+diff -ruN spack-src/src/examples/proxies/cloverleaf3d-ref/CMakeLists.txt spack-src-patched/src/examples/proxies/cloverleaf3d-ref/CMakeLists.txt
+--- spack-src/src/examples/proxies/cloverleaf3d-ref/CMakeLists.txt	2022-08-08 08:55:35.859984221 -0700
++++ spack-src-patched/src/examples/proxies/cloverleaf3d-ref/CMakeLists.txt	2022-08-08 08:55:25.715929378 -0700
+@@ -88,8 +88,13 @@
+     blt_append_custom_compiler_flag(
+             FLAGS_VAR clover_link_flags
+             INTEL   "-nofor_main"
++	    INTELLLVM	"-nofor-main"
+         )
+ 
++    if(C_COMPILER_FAMILY_IS_INTELLLVM)
++        list(APPEND clover_link_flags "-nofor-main")
++    endif()
++
+     # these flags are needeed for gfortran 10 to avoid
+     # compile errors with the mpi interface
+     if(CMAKE_Fortran_COMPILER_VERSION VERSION_GREATER_EQUAL "10" AND Fortran_COMPILER_FAMILY_IS_GNU)
