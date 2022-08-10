@@ -164,6 +164,13 @@ class Ncurses(AutotoolsPackage, GNUMirrorPackage):
             h = os.path.basename(header)
             os.symlink(os.path.join("ncursesw", h), os.path.join(prefix.include, h))
 
+    @run_after("install")
+    def symlink_curses(self):
+        libncurses = "{0}/libncurses.so".format(self.prefix.lib)
+        libcurses = "{0}/libcurses.so".format(self.prefix.lib)
+        if os.path.exists(libncurses):
+            os.symlink(libncurses, libcurses)
+
     def query_parameter_options(self):
         """Use query parameters passed to spec (e.g., "spec[ncurses:wide]")
         to select wide, non-wide, or default/both."""
