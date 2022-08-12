@@ -208,26 +208,29 @@ spack:
   - upcxx +rocm amdgpu_target=gfx90a
 
   # CPU failures
-  #- caliper        # /usr/bin/ld: ../../libcaliper.so.2.7.0: undefined reference to `_dl_sym'
-  #- charliecloud   # autogen.sh: 6: [[: not found
-  #- geopm          # /usr/include/x86_64-linux-gnu/bits/string_fortified.h:95:10: error:'__builtin_strncpy' specified bound 512 equals destination size [-Werror=stringop-truncation]
-  #- gotcha         # /usr/bin/ld: ../../libgotcha.so.2.0.2: undefined reference to `_dl_sym' 
-  #- h5bench        # commons/h5bench_util.h:196: multiple definition of `has_vol_async';
-  #- loki           # ../include/loki/Singleton.h:158:14: warning: 'template<class> class std::auto_ptr' is deprecated: use 'std::unique_ptr' instead [-Wdeprecated-declarations]
-  #- paraview +qt   # llvm@14
-  #- pruners-ninja  # test/ninja_test_util.c:34: multiple definition of `a';
-  #- rempi          # rempi_message_manager.h:53:3: error: 'string' does not name a type
-  #- unifyfs        # gotcha: /usr/bin/ld: ../../libgotcha.so.2.0.2: undefined reference to `_dl_sym' 
-  #- variorum       # /usr/bin/ld: Intel/CMakeFiles/variorum_intel.dir/Broadwell_4F.c.o:(.bss+0x0): multiple definition of `g_platform';
+  #- caliper                                      # /usr/bin/ld: ../../libcaliper.so.2.7.0: undefined reference to `_dl_sym'
+  #- charliecloud                                 # https://github.com/spack/spack/issues/32002; autogen.sh: 6: [[: not found
+  #- geopm                                        # /usr/include/x86_64-linux-gnu/bits/string_fortified.h:95:10: error:'__builtin_strncpy' specified bound 512 equals destination size [-Werror=stringop-truncation]
+  #- gotcha                                       # /usr/bin/ld: ../../libgotcha.so.2.0.2: undefined reference to `_dl_sym' 
+  #- h5bench                                      # https://github.com/spack/spack/issues/32113; commons/h5bench_util.h:196: multiple definition of `has_vol_async';
+  #- loki                                         # https://github.com/spack/spack/issues/32122; SmallObj.h:462:57: error: ISO C++17 does not allow dynamic exception specifications
+  #- paraview +qt                                 # llvm@14
+  #- pruners-ninja                                # https://github.com/spack/spack/issues/32112; test/ninja_test_util.c:34: multiple definition of `a';
+  #- rempi                                        # https://github.com/spack/spack/issues/32123; rempi_message_manager.h:53:3: error: 'string' does not name a type
+  #- unifyfs                                      # gotcha: /usr/bin/ld: ../../libgotcha.so.2.0.2: undefined reference to `_dl_sym' 
+  #- variorum                                     # https://github.com/spack/spack/issues/32110; /usr/bin/ld: Intel/CMakeFiles/variorum_intel.dir/Broadwell_4F.c.o:(.bss+0x0): multiple definition of `g_platform';
 
   # CUDA failures
-  #- caliper +cuda cuda_arch=80               # /usr/bin/ld: ../../libcaliper.so.2.7.0: undefined reference to `_dl_sym'
-  #- parsec +cuda cuda_arch=80                # parsec/mca/device/cuda/transfer.c:168: multiple definition of `parsec_CUDA_d2h_max_flows';
+  #- caliper +cuda cuda_arch=80                   # /usr/bin/ld: ../../libcaliper.so.2.7.0: undefined reference to `_dl_sym'
+  #- parsec +cuda cuda_arch=80                    # https://github.com/spack/spack/issues/32125; parsec/mca/device/cuda/transfer.c:168: multiple definition of `parsec_CUDA_d2h_max_flows';
 
   # ROCm failures
-  #- chai ~benchmarks +rocm amdgpu_target=gfx90a  # umpire: Target "blt_hip" INTERFACE_INCLUDE_DIRECTORIES property contains path: "/tmp/root/spack-stage/spack-stage-umpire-2022.03.1-by6rldnpdowaaoqgxkeqejwyx5uxo2sv/spack-src/HIP_CLANG_INCLUDE_PATH-NOTFOUND/.." which is prefixed in the source directory.
-  #- raja ~openmp +rocm amdgpu_target=gfx90a      # cmake: Could NOT find ROCPRIM (missing: ROCPRIM_INCLUDE_DIRS)
-  #- umpire +rocm amdgpu_target=gfx90a            # Target "blt_hip" INTERFACE_INCLUDE_DIRECTORIES property contains path: "/tmp/root/spack-stage/spack-stage-umpire-2022.03.1-by6rldnpdowaaoqgxkeqejwyx5uxo2sv/spack-src/HIP_CLANG_INCLUDE_PATH-NOTFOUND/.." which is prefixed in the source directory.
+  #- chai ~benchmarks +rocm amdgpu_target=gfx90a  # https://github.com/spack/spack/issues/32133 (umpire)
+  #- mfem +rocm amdgpu_target=gfx90a              # https://github.com/spack/spack/issues/30483; config/defaults.mk:184: Unable to determine HIP_DIR
+  #- raja ~openmp +rocm amdgpu_target=gfx90a      # https://github.com/spack/spack/issues/32127; cmake: Could NOT find ROCPRIM (missing: ROCPRIM_INCLUDE_DIRS)
+  #- trilinos +rocm admgpu_target=gfx90a          # https://github.com/spack/spack/issues/30626; BelosBiCGStabSolMgr.hpp:280:37: dynamic initialization is not supported for __device__, __constant__, __shared__, and __managed__ variables
+  #- umpire +rocm amdgpu_target=gfx90a            # https://github.com/spack/spack/issues/32133; Target "blt_hip" INTERFACE_INCLUDE_DIRECTORIES property contains path: "/tmp/root/spack-stage/spack-stage-umpire-2022.03.1-by6rldnpdowaaoqgxkeqejwyx5uxo2sv/spack-src/HIP_CLANG_INCLUDE_PATH-NOTFOUND/.." which is prefixed in the source directory.
+
 
   mirrors: { "mirror": "s3://spack-binaries/develop/e4s" }
 

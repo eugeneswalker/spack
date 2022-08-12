@@ -212,33 +212,38 @@ spack:
   #- py-warpx@22.05 ^warpx dims=3                     # adios2
   #- py-warpx@22.05 ^warpx dims=rz                    # adios2
   #- variorum@0.4.1                                   # variorum
-
-  # CPU BUILD FAILURES - NOTES
+  #-----
   # adios2: /usr/bin/ld: ../../lib/libadios2_fortran.so.2.8.2: version node not found for symbol adios2_adios_init_mod@adios2_adios_init_serial_smod._; /usr/bin/ld: failed to set dynamic section sizes: bad value
+  # adios2: https://github.com/spack/spack/issues/31817
   # ascent: examples/proxies/cloverleaf3d-ref/clover_main.cpp:24: multiple definition of `main'; /opt/intel/oneapi/compiler/2022.1.0/linux/compiler/lib/intel64_lin/for_main.o:for_main.c:(.text+0x0): first defined here
-  # binutils: gold/powerpc.cc:3590: undefined reference to `gold::Sized_symbol<64>::Value_type gold::Symbol_table::compute_final_value<64>(gold::Sized_symbol<64> const*, gold::Symbol_table::Compute_final_value_status*) const'
+  # ascent: issue: https://github.com/spack/spack/issues/31846
+  # binutils +gold: gold/powerpc.cc:3590: undefined reference to `gold::Sized_symbol<64>::Value_type gold::Symbol_table::compute_final_value<64>(gold::Sized_symbol<64> const*, gold::Symbol_table::Compute_final_value_status*) const'
+  # binutils +gold: issue: https://github.com/spack/spack/issues/29382
   # charliecloud: autoreconf phase: RuntimeError: configure script not found in ...
+  # charliecloud: https://github.com/spack/spack/issues/32002
   # flux-sched: include/yaml-cpp/emitter.h:164:9: error: comparison with NaN always evaluates to false in fast floating point modes [-Werror,-Wtautological-constant-compare]
-  # flux-sched: include/yaml-cpp/emitter.h:171:24: error: comparison with infinity always evaluates to false in fast floating point modes [-Werror,-Wtautological-constant-compare]
+  # flux-sched: https://github.com/spack/spack/issues/32114
   # h5bench: commons/h5bench_util.h:196: multiple definition of `has_vol_async';
+  # h5bench: https://github.com/spack/spack/issues/32113
   # intel-tbb: clang++clang++clang++clang++clang++clang++clang++: : : : : : : clang++error: : unknown argument: '-flifetime-dse=1'
-  # parallel-netcdf: checking if Fortran "integer*1" is ... configure: error: Could not link conftestf.o and conftest.o
   # phist: fortran_bindings/test/kernels.F90(63): error #8284: If the actual argument is scalar, the dummy argument shall be scalar unless the actual argument is of type character or is an element of an array that is not assumed shape, pointer, or polymorphic.   [ARGV]
+  # phist: https://github.com/spack/spack/issues/32111
   # pruners-ninja: test/ninja_test_util.c:34: multiple definition of `a';
+  # pruners-ninja: https://github.com/spack/spack/issues/32112
   # py-numpy@1.23.1: numpy/distutils/checks/cpu_avx512_knm.c:22:9: error: implicit declaration of function '_mm512_4fmadd_ps' is invalid in C99 [-Werror,-Wimplicit-function-declaration]
   # ruby: limits.c:415:34: error: invalid suffix 'D' on floating constant
   # rust: /usr/bin/ld: /opt/intel/oneapi/compiler/2022.1.0/linux/bin-llvm/../compiler/lib/intel64_lin/libimf.a(libm_feature_flag.o): in function `__libm_feature_flag_init': libm_feature_flag.c:(.text+0x25): undefined reference to `__intel_cpu_feature_indicator_x'
-  # scr: scr_globals.h:81:10: fatal error: 'spath_mpi.h' file not found: #include "spath_mpi.h"
+  # unifyfs: client/src/unifyfs.c:1502:7: error: unused function 'next_page_align' [-Werror,-Wunused-function]
+  # unifyfs: pr: https://github.com/spack/spack/pull/32107
   # variorum: ld: Intel/CMakeFiles/variorum_intel.dir/msr_core.c.o:(.bss+0x0): multiple definition of `g_platform'; CMakeFiles/variorum.dir/config_architecture.c.o:(.bss+0x0): first defined here
-  # vtk-m: clang++: error: clang frontend command failed with exit code 139 (use -v to see invocation)
+  # variorum: https://github.com/spack/spack/issues/32110
 
   # GPU BUILD FAILURES
   #- ginkgo@1.4.0 +oneapi %dpcpp ^cmake%oneapi                                              # ginkgo
   #- hpctoolkit@2022.04.15 +level_zero                                                      # dyninst
   #- sundials@6.2.0 +sycl cxxstd=17                                                         # sundials
   #- tau@2.31.1 +mpi +opencl +level_zero ~pdt %oneapi ^binutils%gcc@9.4.0 ^papi%gcc@9.4.0   # tau
-
-  # GPU BUILD FAILURES - NOTES
+  #-----
   # berkeley-db %dpcpp: dpcpp: dpcpperror: : no such file or directory: '/tmp/conftest-9d8d34.o'
   # ginkgo %dpcpp: CMakeTestCXXCompiler.cmake:62: /usr/bin/ld: warning: libsvml.so, needed by /opt/intel/oneapi/compiler/2022.1.0/linux/bin-llvm/../lib/libsycl.so, not found (try using -rpath or -rpath-link) ...
   # ncurses %dpcpp: If you have ncurses 4.2 applications, you should read the INSTALL document, and install the terminfo without the -x optiontic: error while loading shared libraries: libsvml.so: cannot open shared object file: No such file or directory
