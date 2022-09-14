@@ -227,7 +227,7 @@ e4s-mac-protected-generate:
     paths:
       - "${CI_PROJECT_DIR}/jobs_scratch_dir"
   tags:
-  - omicron
+  - lambda
   interruptible: true
   retry:
     max: 2
