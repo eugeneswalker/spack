@@ -1,0 +1,26 @@
+diff -ruN spack-src/config/defaults.mk spack-src-patched/config/defaults.mk
+--- spack-src/config/defaults.mk	2022-10-22 15:46:30.000000000 -0700
++++ spack-src-patched/config/defaults.mk	2022-10-25 23:05:56.757890545 -0700
+@@ -176,6 +176,10 @@
+    MPI_DIR := $(patsubst %/,%,$(dir $(MPI_DIR)))
+    MPI_OPT = -I$(MPI_DIR)/include
+    MPI_LIB = -L$(MPI_DIR)/lib $(XLINKER)-rpath,$(MPI_DIR)/lib -lmpi
++   HIPSPARSE_OPT = ""
++   ifdef HIPSPARSE_DIR
++     HIPSPARSE_OPT = -I$(HIPSPARSE_DIR)/include
++   endif
+ endif
+ 
+ # ROCM/HIP directory such that ROCM/HIP libraries like rocsparse and rocrand are
+diff -ruN spack-src/makefile spack-src-patched/makefile
+--- spack-src/makefile	2022-10-22 15:46:30.000000000 -0700
++++ spack-src-patched/makefile	2022-10-25 23:06:47.010170545 -0700
+@@ -246,7 +246,7 @@
+ # HIP configuration
+ ifeq ($(MFEM_USE_HIP),YES)
+    ifeq ($(MFEM_USE_MPI),YES)
+-      INCFLAGS += $(MPI_OPT)
++      INCFLAGS += $(MPI_OPT) $(HIPSPARSE_OPT)
+       ALL_LIBS += $(MPI_LIB)
+    endif
+    MFEM_CXX ?= $(HIP_CXX)

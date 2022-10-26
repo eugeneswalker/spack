@@ -429,6 +429,7 @@ class Mfem(Package, CudaPackage, ROCmPackage):
     patch("mfem-4.2-petsc-3.15.0.patch", when="@4.2.0+petsc ^petsc@3.15.0:")
     patch("mfem-4.3-hypre-2.23.0.patch", when="@4.3.0")
     patch("mfem-4.3-cusparse-11.4.patch", when="@4.3.0+cuda")
+    patch("mfem-4.5-hipsparse.patch", when="@4.5.0+rocm")
 
     # Patch to fix MFEM makefile syntax error. See
     # https://github.com/mfem/mfem/issues/1042 for the bug report and
@@ -873,6 +874,7 @@ class Mfem(Package, CudaPackage, ROCmPackage):
                 options += [
                     "HIP_DIR=%s" % spec["rocsparse"].prefix,
                     "HIP_LIB=%s" % ld_flags_from_library_list(spec["hipsparse"].libs),
+                    "HIPSPARSE_DIR={0}".format(spec['hipsparse'].prefix),
                 ]
 
         if "+occa" in spec:
