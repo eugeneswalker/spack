@@ -87,6 +87,11 @@ class Parsec(CMakePackage, CudaPackage):
             self.define_from_variant("PARSEC_DEBUG_HISTORY", "debug_verbose"),
             self.define_from_variant("PARSEC_DEBUG_PARANOID", "debug_verbose"),
         ]
+        if self.spec.satisfies("%oneapi@2022.2.0:"):
+            cflags = []
+            cflags.append("-Wno-error=unused-but-set-variable")
+            cflags.append("-Wno-error=implicit-function-declaration")
+            args.append(self.define("CMAKE_C_FLAGS", " ".join(cflags)))
         return args
 
     @run_after("install")
