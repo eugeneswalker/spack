@@ -188,6 +188,7 @@ class VtkM(CMakePackage, CudaPackage, ROCmPackage):
                             vtkm version lower than 1.3"
                     )
                 options.append("-DVTKm_ENABLE_MPI:BOOL=ON")
+                options.append(self.define("CMAKE_HIP_FLAGS", "-I/opt/cray/pe/mpich/8.1.16/ofi/crayclang/10.0/include -L/opt/cray/pe/mpich/8.1.16/ofi/crayclang/10.0/lib -lmpi -L/opt/cray/pe/mpich/8.1.16/gtl/lib -lmpi_gtl_hsa"))
             else:
                 options.append("-DVTKm_ENABLE_MPI:BOOL=OFF")
 
