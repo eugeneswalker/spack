@@ -188,7 +188,17 @@ class VtkM(CMakePackage, CudaPackage, ROCmPackage):
                             vtkm version lower than 1.3"
                     )
                 options.append("-DVTKm_ENABLE_MPI:BOOL=ON")
-                options.append(self.define("CMAKE_HIP_FLAGS", "-I/opt/cray/pe/mpich/8.1.16/ofi/crayclang/10.0/include -L/opt/cray/pe/mpich/8.1.16/ofi/crayclang/10.0/lib -lmpi -L/opt/cray/pe/mpich/8.1.16/gtl/lib -lmpi_gtl_hsa"))
+                # Workaround for Crusher +MPI +ROCM
+                if "+rocm" in spec:
+                    # Special handling for crusher
+                    if "CRAY_MPICH_ROOTDIR" in os.environ:
+                        cray_mpich_root = os.environ.get("CRAY_MPICH_ROOTDIR")
+                        options.append(self.define("CMAKE_HIP_FLAGS",
+                            "-I{0} -L{1} -lmpi -L{2}/gtl/lib -lmpi_gtl_hsa".format(
+                                spec["mpi"].prefix.include,
+                                spec["mpi"].prefix.lib,
+                                cray_mpich_root,
+                        )))
             else:
                 options.append("-DVTKm_ENABLE_MPI:BOOL=OFF")
 
