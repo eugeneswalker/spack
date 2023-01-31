@@ -73,7 +73,7 @@ class Trilinos(bTrilinos):
     def setup_dependent_package(self, module, dependent_spec):
         if "+wrapper" in self.spec:
             # Hardcode nvcc_wrapper path to avoid kokkos-nvcc-wrapper error with trilinos as an external
-            self.spec.kokkos_cxx = os.path.join(os.getenv("SPACK_MANAGER"), "bin", "nvcc_wrapper")
+            self.spec.kokkos_cxx = self.spec["kokkos-nvcc-wrapper"].kokkos_cxx
         else:
             self.spec.kokkos_cxx = spack_cxx
 
