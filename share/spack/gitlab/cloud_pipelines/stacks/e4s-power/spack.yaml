@@ -64,7 +64,7 @@ spack:
   - dyninst
   - ecp-data-vis-sdk ~cuda ~rocm +adios2 +ascent +cinema +darshan +faodel +hdf5 ~paraview +pnetcdf +sz +unifyfs +veloc ~visit +vtkm +zfp # +paraview fails: FAILED: VTK/Filters/Statistics/CMakeFiles/FiltersStatistics-objects.dir/vtkPCAStatistics.cxx.o: /tmp/ccgvkIk5.s: Assembler messages: /tmp/ccgvkIk5.s:260012: Error: invalid machine `power10'
   - exaworks
-  - flecsi
+  - flecsi@2.1.0
   - flit
   - flux-core
   - fortrilinos
@@ -146,7 +146,7 @@ spack:
   - caliper +cuda
   - chai ~benchmarks ~tests +cuda ^umpire ~shared
   - ecp-data-vis-sdk +cuda cuda_arch=70 +adios2 +hdf5 ~paraview +vtkm +zfp # +paraview fails:  FAILED: VTK/Filters/Statistics/CMakeFiles/FiltersStatistics-objects.dir/vtkPCAStatistics.cxx.o; /tmp/ccjmJhb6.s: Assembler messages: /tmp/ccjmJhb6.s:260012: Error: invalid machine `power10'
-  - flecsi +cuda
+  - flecsi@2.1.0 +cuda
   - flux-core +cuda
   - ginkgo +cuda
   - heffte +cuda
