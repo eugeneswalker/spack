@@ -95,6 +95,66 @@ spack:
       environment: {}
       extra_rpaths: []
 
+  packages:
+    all:
+      require: '%oneapi'
+      providers:
+        blas: [openblas]
+        mpi: [mpich]
+      target: [x86_64]
+      variants: +mpi
+    elfutils:
+      variants: +bzip2 ~nls +xz
+    hdf5:
+      variants: +fortran +hl +shared
+    libfabric:
+      variants: fabrics=sockets,tcp,udp,rxm
+    libunwind:
+      variants: +pic +xz
+    mpich:
+      variants: ~wrapperrpath
+    ncurses:
+      variants: +termlib
+    openblas:
+      variants: threads=openmp
+    python:
+      version: [3.8.13]
+    trilinos:
+      variants: +amesos +amesos2 +anasazi +aztec +belos +boost +epetra +epetraext
+        +ifpack +ifpack2 +intrepid +intrepid2 +isorropia +kokkos +ml +minitensor +muelu
+        +nox +piro +phalanx +rol +rythmos +sacado +stk +shards +shylu +stokhos +stratimikos
+        +teko +tempus +tpetra +trilinoscouplings +zoltan +zoltan2 +superlu-dist gotype=long_long
+    vtk-m:
+      require: "@1.9:"
+    xz:
+      variants: +pic
+    mesa:
+      version: [21.3.8]
+
+    binutils:
+      require: '%gcc'
+      variants: +ld +gold +headers +libiberty ~nls
+    bison:
+      require: '%gcc'
+    krb5:
+      require: '%gcc'
+    llvm:
+      require: '%gcc'
+    m4:
+      require: '%gcc'
+    openssh:
+      require: '%gcc'
+    papi:
+      require: '%gcc'
+    py-scipy:
+      require: '%gcc'
+    ruby:
+      require: '%gcc'
+    rust:
+      require: '%gcc'
+    unzip:
+      require: '%gcc'
+
   specs:
   # CPU
   - adios
@@ -114,7 +174,9 @@ spack:
   - charliecloud
   - conduit
   - datatransferkit
-  - ecp-data-vis-sdk +ascent+adios2+cinema+darshan+faodel+hdf5+paraview+pnetcdf+sz+unifyfs+veloc+visit+vtkm+zfp
+  - ecp-data-vis-sdk +ascent+adios2~cinema+darshan+faodel+hdf5~paraview+pnetcdf+sz+unifyfs+veloc~visit+vtkm+zfp
+    ^vtk-m ~kokkos
+    ^hdf5@1.14
   - exaworks
   - flecsi
   - flit
@@ -125,8 +187,6 @@ spack:
   - gmp
   - gotcha
   - h5bench
-  - hdf5-vol-async
-  - hdf5-vol-log
   - heffte +fftw
   - hpx networking=mpi
   - hypre
