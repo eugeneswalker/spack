@@ -156,8 +156,6 @@ class EcpDataVisSdk(BundlePackage, CudaPackage, ROCmPackage):
         when="+ascent",
         propagate=["adios2", "cuda"] + cuda_arch_variants,
     )
-    depends_on("ascent+openmp", when="~rocm+ascent")
-    depends_on("ascent~openmp", when="+rocm+ascent")
 
     # Need to explicitly turn off conduit hdf5_compat in order to build
     # hdf5@1.12 which is required for SDK
@@ -188,8 +186,6 @@ class EcpDataVisSdk(BundlePackage, CudaPackage, ROCmPackage):
     # TODO: When Ascent is updated to use VTK-m >= 1.8 move examples to
     # the main spec.
     depends_on("vtk-m+examples", when="+vtkm ^vtk-m@1.8:")
-    depends_on("vtk-m+openmp", when="~rocm+vtkm")
-    depends_on("vtk-m~openmp", when="+rocm+vtkm")
 
     # +python is currently broken in sz
     # dav_sdk_depends_on('sz+shared+python+random_access',

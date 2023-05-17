@@ -75,7 +75,7 @@ spack:
         +nox +piro +phalanx +rol +rythmos +sacado +stk +shards +shylu +stokhos +stratimikos
         +teko +tempus +tpetra +trilinoscouplings +zoltan +zoltan2 +superlu-dist gotype=long_long
     vtk-m:
-      require: ~openmp
+      require: "@1.9:"
     xz:
       variants: +pic
     mesa:
@@ -108,13 +108,11 @@ spack:
   specs:
   # CPU
   - adios
-  - adios2
   - alquimia
   - aml
   - arborx
   - archer
   - argobots
-  - ascent
   - amrex
   - axom
   - bolt
@@ -123,18 +121,16 @@ spack:
   - caliper
   - chai ~benchmarks ~tests
   - conduit
-  - darshan-runtime
-  - darshan-util
   - datatransferkit
-  - ecp-data-vis-sdk +ascent+adios2+cinema+darshan+faodel+hdf5+paraview+pnetcdf+sz+unifyfs+veloc+visit+vtkm+zfp
-  - faodel
+  - ecp-data-vis-sdk +ascent+adios2+cinema+darshan+faodel+hdf5+paraview+pnetcdf+sz+unifyfs+veloc~visit+vtkm+zfp
+    ^vtk-m ~kokkos
+    ^hdf5@1.14
   - flit
   - fortrilinos
   - gasnet
   - globalarrays
   - gmp
   - gotcha
-  - hdf5 +fortran +hl +shared
   - heffte +fftw
   - hypre
   - kokkos-kernels +openmp
@@ -158,7 +154,6 @@ spack:
   - openpmd-api
   - papi
   - papyrus
-  - parallel-netcdf
   - parsec ~cuda
   - pdt
   - petsc
@@ -179,7 +174,6 @@ spack:
   - superlu-dist
   - superlu
   - swig
-  - sz
   - tasmanian
   - trilinos@13.0.1 +amesos +amesos2 +anasazi +aztec +belos +boost +epetra +epetraext
     +ifpack +ifpack2 +intrepid +intrepid2 +isorropia +kokkos +ml +minitensor +muelu
@@ -188,18 +182,17 @@ spack:
   - turbine
   - umap
   - umpire
-  - unifyfs
   - upcxx
-  - veloc
-  - vtk-m ~openmp # can't build +openmp w/ %oneapi: https://github.com/spack/spack/issues/31830
   - wannier90
-  - zfp
 
   # GPU
   - aml +ze
   - arborx +sycl ^kokkos +sycl +openmp std=17 +tests +examples
   - cabana +sycl ^kokkos +sycl +openmp std=17 +tests +examples
-  - ecp-data-vis-sdk +vtkm ^vtk-m +kokkos ^kokkos +sycl +openmp std=17 +tests +examples
+  - ecp-data-vis-sdk ~ascent+adios2+hdf5+paraview+pnetcdf+sz~visit+vtkm+zfp
+    ^hdf5@1.14
+    ^vtk-m +kokkos
+    ^kokkos +sycl+openmp+tests+examples std=17
   - kokkos +sycl +openmp std=17 +tests +examples %oneapi
   - kokkos-kernels build_type=Release ^kokkos +sycl +openmp std=17 +tests +examples %oneapi
 
@@ -252,8 +245,8 @@ spack:
   # swig@4.0.2-fortran: /spack/opt/spack/linux-ubuntu20.04-x86_64/gcc-11.1.0/m4-1.4.19-p3otmjixpi6zibdsyoqib5dpzfshq3nj/bin/m4:/spack/opt/spack/linux-ubuntu20.04-x86_64/oneapi-2023.0.0/bison-3.8.2-xca2sot4jhd72hvj2m2b3ajchagczvau/share/bison/skeletons/yacc.c:420: undefined macro `b4_symbol(103, tag)'
   # tau: Error: Unable to identify ifort lib directory
   # variorum: ld: Intel/CMakeFiles/variorum_intel.dir/msr_core.c.o:(.bss+0x0): multiple definition of `g_platform'; CMakeFiles/variorum.dir/config_architecture.c.o:(.bss+0x0): first defined here
-  # vtk-m +openmp: clang++: error: clang frontend command failed with exit code 139 (use -v to see invocation)
-
+  # ecp-data-vis-sdk ~ascent: Ascent needs C++11 max, Kokkos requires C++17 for SYCL
+  # ecp-data-vis-sdk ~visit: VisIt needs an older Python than what is supported by newer PyH5 needed by HDF5 1.14
   # GPU FAILURES
   # - amrex +sycl                           # amrex
   # - ginkgo +oneapi                        # ginkgo

@@ -75,7 +75,14 @@ class VtkM(CMakePackage, CudaPackage, ROCmPackage):
     variant(
         "cuda_native", default=True, description="build using native cuda backend", when="+cuda"
     )
-    variant("openmp", default=(sys.platform != "darwin"), description="build openmp support")
+    # Missing OpenMP extensions in ROCm package
+    # https://github.com/spack/spack/issues/32197
+    variant(
+        "openmp",
+        default=(sys.platform != "darwin"),
+        description="build openmp support",
+        when="~rocm",
+    )
     variant("tbb", default=(sys.platform == "darwin"), description="build TBB support")
 
     depends_on("cmake@3.12:", type="build")  # CMake >= 3.12
@@ -83,6 +90,10 @@ class VtkM(CMakePackage, CudaPackage, ROCmPackage):
 
     conflicts("%gcc@:4.10", msg="vtk-m requires gcc >= 5. Please install a newer version")
     conflicts("%gcc@11:", when="@:1.5.2", msg="DIY has a issue building with gcc 11")
+
+    # Internal compiler bug
+    # https://github.com/spack/spack/issues/31830
+    conflicts("%oneapi@2022.1.0 +openmp")
 
     depends_on("cuda@10.1.0:", when="+cuda_native")
     depends_on("tbb", when="+tbb")
