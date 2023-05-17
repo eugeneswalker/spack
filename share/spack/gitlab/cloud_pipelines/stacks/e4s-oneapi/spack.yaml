@@ -114,6 +114,7 @@ spack:
   - charliecloud
   - conduit
   - datatransferkit
+  - ecp-data-vis-sdk +ascent+adios2+cinema+darshan+faodel+hdf5+paraview+pnetcdf+sz+unifyfs+veloc+visit+vtkm+zfp
   - exaworks
   - flecsi
   - flit
