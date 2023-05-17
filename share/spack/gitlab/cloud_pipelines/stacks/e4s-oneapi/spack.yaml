@@ -126,6 +126,7 @@ spack:
   - darshan-runtime
   - darshan-util
   - datatransferkit
+  - ecp-data-vis-sdk +ascent+adios2+cinema+darshan+faodel+hdf5+paraview+pnetcdf+sz+unifyfs+veloc+visit+vtkm+zfp
   - faodel
   - flit
   - fortrilinos
@@ -198,6 +199,7 @@ spack:
   - aml +ze
   - arborx +sycl ^kokkos +sycl +openmp std=17 +tests +examples
   - cabana +sycl ^kokkos +sycl +openmp std=17 +tests +examples
+  - ecp-data-vis-sdk +vtkm ^vtk-m +kokkos ^kokkos +sycl +openmp std=17 +tests +examples
   - kokkos +sycl +openmp std=17 +tests +examples %oneapi
   - kokkos-kernels build_type=Release ^kokkos +sycl +openmp std=17 +tests +examples %oneapi
 
