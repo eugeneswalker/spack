@@ -76,6 +76,8 @@ class Sz(CMakePackage, AutotoolsPackage):
     depends_on("cmake@3.13:", type="build")
     depends_on("cunit", type="test")
 
+    conflicts("%oneapi +hdf5")
+
     patch("ctags-only-if-requested.patch", when="@2.1.8.1:2.1.8.3")
 
     def setup_run_environment(self, env):

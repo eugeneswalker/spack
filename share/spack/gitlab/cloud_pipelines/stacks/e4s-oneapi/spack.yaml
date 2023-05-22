@@ -192,7 +192,7 @@ spack:
   - ecp-data-vis-sdk ~ascent+adios2+hdf5+paraview+pnetcdf+sz~visit+vtkm+zfp
     ^hdf5@1.14
     ^vtk-m +kokkos
-    ^kokkos +sycl+openmp+tests+examples std=17
+    ^kokkos ~sycl+openmp+tests+examples std=17
   - kokkos +sycl +openmp std=17 +tests +examples %oneapi
   - kokkos-kernels build_type=Release ^kokkos +sycl +openmp std=17 +tests +examples %oneapi
 
