@@ -191,5 +191,7 @@ class EcpDataVisSdk(BundlePackage, CudaPackage, ROCmPackage):
     # +python is currently broken in sz
     # dav_sdk_depends_on('sz+shared+python+random_access',
     dav_sdk_depends_on("sz+shared+random_access", when="+sz", propagate=["hdf5", "fortran"])
+    # sz +hdf5 is currently broken when using OneAPI
+    depends_on("sz~hdf5", when="%oneapi +hdf5")
 
     dav_sdk_depends_on("zfp", when="+zfp", propagate=["cuda"] + cuda_arch_variants)

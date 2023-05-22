@@ -107,6 +107,11 @@ class VtkM(CMakePackage, CudaPackage, ROCmPackage):
 
     # VTK-m uses the default Kokkos backend
     depends_on("kokkos", when="+kokkos")
+
+    # VTK-m currently does not work with SYCL
+    # https://gitlab.kitware.com/vtk/vtk-m/-/issues/780
+    conflicts("kokkos+sycl", when="+kokkos")
+
     # VTK-m native CUDA and Kokkos CUDA backends are not compatible
     depends_on("kokkos ~cuda", when="+kokkos +cuda +cuda_native")
     depends_on("kokkos +cuda", when="+kokkos +cuda ~cuda_native")
