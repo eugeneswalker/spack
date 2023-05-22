@@ -674,7 +674,6 @@ ml-linux-x86_64-rocm-build:
     - artifacts: True
       job: ml-linux-x86_64-rocm-generate
 
-<<<<<<< Updated upstream
 #######################################
 # E4S - Cray
 #######################################
@@ -697,8 +696,6 @@ e4s-cray-build:
     - artifacts: True
       job: e4s-cray-generate
 
-=======
->>>>>>> Stashed changes
 ########################################
 # Deprecated CI testing
 ########################################
