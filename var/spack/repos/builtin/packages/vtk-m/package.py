@@ -110,7 +110,7 @@ class VtkM(CMakePackage, CudaPackage, ROCmPackage):
 
     # VTK-m currently does not work with SYCL
     # https://gitlab.kitware.com/vtk/vtk-m/-/issues/780
-    conflicts("kokkos+sycl", when="+kokkos")
+    depends_on("kokkos ~sycl", when="+kokkos")
 
     # VTK-m native CUDA and Kokkos CUDA backends are not compatible
     depends_on("kokkos ~cuda", when="+kokkos +cuda +cuda_native")

@@ -13,6 +13,7 @@ class Embree(CMakePackage):
     url = "https://github.com/embree/embree/archive/v3.7.0.tar.gz"
     maintainers("aumuell")
 
+    version("3.13.5", sha256="b8c22d275d9128741265537c559d0ea73074adbf2f2b66b0a766ca52c52d665b")
     version("3.13.1", sha256="00dbd852f19ae2b95f5106dd055ca4b304486436ced0ccf842aec4e38a4df425")
     version("3.13.0", sha256="4d86a69508a7e2eb8710d571096ad024b5174834b84454a8020d3a910af46f4f")
     version("3.12.2", sha256="22a527622497e07970e733f753cc9c10b2bd82c3b17964e4f71a5fd2cdfca210")
@@ -26,6 +27,10 @@ class Embree(CMakePackage):
 
     variant("ispc", default=True, description="Enable ISPC support")
     depends_on("ispc", when="+ispc", type="build")
+
+    # CMake 3.20 changed OneAPI compire id from LLVM -> IntelLLVM
+    # fixed in 3.13.4
+    conflicts("cmake@3.20:", when="@:3.13.3 %oneapi")
 
     depends_on("tbb")
 
