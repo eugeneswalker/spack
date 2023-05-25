@@ -147,12 +147,18 @@ spack:
       require: '%gcc'
     openssh:
       require: '%gcc'
+    openvkl:
+      require: '@1.3.0'
     papi:
       require: '%gcc'
     paraview:
-      require: "+osmesa"
+      require: "+osmesa~raytracing"
     py-scipy:
       require: '%gcc'
+    py-setuptools:
+      require: '%gcc'
+    py-setuptools-scm:
+      require: '@6.3.2 %gcc'
     ruby:
       require: '%gcc'
     rust:
