@@ -640,7 +640,7 @@ class ViewDescriptor:
 
         # With deps, requires traversal
         if self.link == "all" or self.link == "run":
-            deptype = ("run") if self.link == "run" else ("link", "run")
+            deptype = ("run") if self.link == "run" else ("link", "run", "build")
             specs = list(
                 spack.traverse.traverse_nodes(
                     concretized_root_specs, deptype=deptype, key=dag_hash
