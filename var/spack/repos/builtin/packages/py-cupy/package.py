@@ -29,11 +29,11 @@ class PyCupy(PythonPackage, CudaPackage):
     depends_on("py-setuptools", type="build")
     depends_on("py-cython@0.29.22:2", type="build")
     depends_on("py-fastrlock@0.5:", type=("build", "run"))
-
-    # Based on https://github.com/cupy/cupy/releases
     depends_on("py-numpy@1.20:1.25", when="@:11", type=("build", "run"))
     depends_on("py-numpy@1.20:1.26", when="@12:", type=("build", "run"))
     depends_on("py-scipy@1.6:1.12", type=("build", "run"))
+
+    # Based on https://github.com/cupy/cupy/releases
     depends_on("cuda@:11.9", when="@:11")
     depends_on("cuda@:12.1", when="@12:")
     depends_on("nccl")
