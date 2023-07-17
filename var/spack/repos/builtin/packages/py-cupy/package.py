@@ -6,7 +6,7 @@
 from spack.package import *
 
 
-class PyCupy(PythonPackage, CudaPackage):
+class PyCupy(PythonPackage, CudaPackage, ROCmPackage):
     """CuPy is an open-source array library accelerated with
     NVIDIA CUDA. CuPy provides GPU accelerated computing with
     Python. CuPy uses CUDA-related libraries including cuBLAS,
@@ -32,17 +32,28 @@ class PyCupy(PythonPackage, CudaPackage):
     depends_on("py-numpy@1.20:1.25", when="@:11", type=("build", "run"))
     depends_on("py-numpy@1.20:1.26", when="@12:", type=("build", "run"))
     depends_on("py-scipy@1.6:1.12", type=("build", "run"))
-    depends_on("cuda@:11.9", when="@:11")
-    depends_on("cuda@:12.1", when="@12:")
-    depends_on("nccl")
-    depends_on("cudnn")
-    depends_on("cutensor")
+    depends_on("cuda@:11.9", when="@:11 +cuda")
+    depends_on("cuda@:12.1", when="@12: +cuda")
+    depends_on("nccl", when="+cuda")
+    depends_on("cudnn", when="+cuda")
+    depends_on("cutensor", when="+cuda")
+    depends_on("hipcub", when="+rocm", type=("build", "link", "run"))
+    depends_on("hipblas", when="+rocm", type=("build", "link", "run"))
+    depends_on("hiprand", when="+rocm", type=("build", "link", "run"))
+    depends_on("hipsparse", when="+rocm", type=("build", "link", "run"))
+    depends_on("hipfft", when="+rocm", type=("build", "link", "run"))
+    depends_on("roctracer-dev", when="+rocm", type=("build", "link", "run"))
+    depends_on("rocprofiler-dev", when="+rocm", type=("build", "link", "run"))
 
-    conflicts("~cuda")
+    conflicts("~cuda ~rocm")
 
     def setup_build_environment(self, env):
         env.set("CUPY_NUM_BUILD_JOBS", make_jobs)
-        if not self.spec.satisfies("cuda_arch=none"):
+        if self.spec.satisfies("+cuda"):
             cuda_arch = self.spec.variants["cuda_arch"].value
             arch_str = ";".join("arch=compute_{0},code=sm_{0}".format(i) for i in cuda_arch)
             env.set("CUPY_NVCC_GENERATE_CODE", arch_str)
+        if self.spec.satisfies("+rocm"):
+            env.set("ROCM_HOME", self.spec["hip"].prefix)
+            env.set("CUPY_INSTALL_USE_HIP", 1)
+#            env.set("HCC_AMDGPU_TARGET", self.spec.variants["amdgpu_target"].value)
