@@ -24,8 +24,6 @@ class PyCupy(PythonPackage, CudaPackage):
     version("11.3.0", sha256="d057cc2f73ecca06fae8b9c270d9e14116203abfd211a704810cc50a453b4c9e")
     version("11.2.0", sha256="c33361f117a347a63f6996ea97446d17f1c038f1a1f533e502464235076923e2")
 
-    variant("all", default=False, description="Enable optional py-scipy dependency")
-
     depends_on("python@3.7:", when="@:11", type=("build", "run"))
     depends_on("python@3.8:", when="@12:", type=("build", "run"))
     depends_on("py-setuptools", type="build")
@@ -33,8 +31,7 @@ class PyCupy(PythonPackage, CudaPackage):
     depends_on("py-fastrlock@0.5:", type=("build", "run"))
     depends_on("py-numpy@1.20:1.25", when="@:11", type=("build", "run"))
     depends_on("py-numpy@1.20:1.26", when="@12:", type=("build", "run"))
-
-    depends_on("py-scipy@1.6:1.12", when="+all", type=("build", "run"))
+    depends_on("py-scipy@1.6:1.12", type=("build", "run"))
 
     # Based on https://github.com/cupy/cupy/releases
     depends_on("cuda@:11.9", when="@:11")
