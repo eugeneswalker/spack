@@ -1,0 +1,12 @@
+diff -ruN spack-src/install/cupy_builder/_compiler.py spack-src-patched/install/cupy_builder/_compiler.py
+--- spack-src/install/cupy_builder/_compiler.py	2023-05-24 02:11:06.000000000 -0700
++++ spack-src-patched/install/cupy_builder/_compiler.py	2023-07-25 07:15:34.751560473 -0700
+@@ -236,7 +236,7 @@
+         compiler_so = rocm_path
+ 
+         hip_version = build.get_hip_version()
+-        postargs = ['-O2', '-fPIC', '--include', 'hip_runtime.h']
++        postargs = ['-O2', '-fPIC', '--include', 'hip/hip_runtime.h']
+         if hip_version >= 402:
+             postargs += ['--std=c++14']
+         else:

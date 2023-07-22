@@ -3,10 +3,12 @@
 #
 # SPDX-License-Identifier: (Apache-2.0 OR MIT)
 
+import os
+
 from spack.package import *
 
 
-class PyCupy(PythonPackage, CudaPackage):
+class PyCupy(PythonPackage, CudaPackage, ROCmPackage):
     """CuPy is an open-source array library accelerated with
     NVIDIA CUDA. CuPy provides GPU accelerated computing with
     Python. CuPy uses CUDA-related libraries including cuBLAS,
@@ -24,6 +26,8 @@ class PyCupy(PythonPackage, CudaPackage):
     version("11.3.0", sha256="d057cc2f73ecca06fae8b9c270d9e14116203abfd211a704810cc50a453b4c9e")
     version("11.2.0", sha256="c33361f117a347a63f6996ea97446d17f1c038f1a1f533e502464235076923e2")
 
+    variant("all", default=False, description="Enable optional py-scipy, optuna, and cython")
+
     depends_on("python@3.7:", when="@:11", type=("build", "run"))
     depends_on("python@3.8:", when="@12:", type=("build", "run"))
     depends_on("py-setuptools", type="build")
@@ -31,20 +35,69 @@ class PyCupy(PythonPackage, CudaPackage):
     depends_on("py-fastrlock@0.5:", type=("build", "run"))
     depends_on("py-numpy@1.20:1.25", when="@:11", type=("build", "run"))
     depends_on("py-numpy@1.20:1.26", when="@12:", type=("build", "run"))
-    depends_on("py-scipy@1.6:1.12", type=("build", "run"))
+
+    depends_on("py-scipy@1.6:1.12", when="+all", type=("build", "run"))
+    depends_on("py-cython@0.29.22:2", when="+all", type=("build", "run"))
+    depends_on("py-optuna@2:", when="+all", type=("build", "run"))
 
     # Based on https://github.com/cupy/cupy/releases
-    depends_on("cuda@:11.9", when="@:11")
-    depends_on("cuda@:12.1", when="@12:")
-    depends_on("nccl")
-    depends_on("cudnn")
-    depends_on("cutensor")
+    depends_on("cuda@:11.9", when="@:11 +cuda")
+    depends_on("cuda@:12.1", when="@12: +cuda")
 
-    conflicts("~cuda")
+    for a in CudaPackage.cuda_arch_values:
+        depends_on("nccl +cuda cuda_arch={0}".format(a), when="+cuda cuda_arch={0}".format(a))
+
+    depends_on("cudnn", when="+cuda")
+    depends_on("cutensor", when="+cuda")
+
+    for _arch in ROCmPackage.amdgpu_targets:
+        arch_str = "amdgpu_target={0}".format(_arch)
+        rocm_str = "+rocm {0}".format(arch_str)
+        depends_on("rocprim {0}".format(arch_str), when=rocm_str, type=("build", "link", "run"))
+        depends_on("rocsolver {0}".format(arch_str), when=rocm_str, type=("build", "link", "run"))
+        depends_on("rocthrust {0}".format(arch_str), when=rocm_str, type=("build", "link", "run"))
+        depends_on("rocrand {0}".format(arch_str), when=rocm_str, type=("build", "link", "run"))
+        depends_on("hipcub {0}".format(rocm_str), when=rocm_str, type=("build", "link", "run"))
+        depends_on("hipblas {0}".format(rocm_str), when=rocm_str, type=("build", "link", "run"))
+        depends_on("hiprand {0}".format(rocm_str), when=rocm_str, type=("build", "link", "run"))
+        depends_on("hipsparse {0}".format(rocm_str), when=rocm_str, type=("build", "link", "run"))
+        depends_on("hipfft {0}".format(rocm_str), when=rocm_str, type=("build", "link", "run"))
+
+    depends_on("rccl", when="+rocm", type=("build", "link", "run"))
+    depends_on("roctracer-dev", when="+rocm", type=("build", "link", "run"))
+    depends_on("rocprofiler-dev", when="+rocm", type=("build", "link", "run"))
+
+    conflicts("~cuda ~rocm")
+    conflicts("+cuda +rocm")
+    conflicts("+cuda cuda_arch=none")
 
     def setup_build_environment(self, env):
-        env.set("CUPY_NUM_BUILD_JOBS", make_jobs)
-        if not self.spec.satisfies("cuda_arch=none"):
+        if self.spec.satisfies("+cuda"):
+            env.set("CUPY_NUM_BUILD_JOBS", make_jobs)
             cuda_arch = self.spec.variants["cuda_arch"].value
             arch_str = ";".join("arch=compute_{0},code=sm_{0}".format(i) for i in cuda_arch)
             env.set("CUPY_NVCC_GENERATE_CODE", arch_str)
+        elif self.spec.satisfies("+rocm"):
+            spec = self.spec
+
+            incs = {
+                "roctracer-dev": ["include/roctracer"],
+                "hiprand": ["include"],
+                "rocrand": ["include"],
+                "rocthrust": ["include"],
+                "rocprim": ["include"],
+                "hip": ["include", "include/hip"],
+            }
+
+            inc_dirs = []
+            for pkg, ds in incs.items():
+                for d in ds:
+                    p = os.path.join(spec[pkg].prefix, d)
+                    if os.path.exists(p):
+                        inc_dirs.append(p)
+
+            env.set("CUPY_INCLUDE_PATH", ":".join(inc_dirs))
+
+            env.set("HIPCC", "{0}/bin/hipcc".format(self.spec["hip"].prefix))
+            env.set("ROCM_HOME", self.spec["hipcub"].prefix)
+            env.set("CUPY_INSTALL_USE_HIP", 1)
