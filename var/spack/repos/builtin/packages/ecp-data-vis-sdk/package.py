@@ -134,10 +134,9 @@ class EcpDataVisSdk(BundlePackage, CudaPackage, ROCmPackage):
     conflicts("~hdf5", when="^hdf5-vol-async")
     conflicts("~hdf5", when="^hdf5-vol-cache")
     conflicts("~hdf5", when="^hdf5-vol-log")
-    for compiler in {"cce", "clang", "gcc", "xl", "xl_r"}:
-        depends_on("hdf5-vol-async", when="%{} +hdf5 ^hdf5@1.14:".format(compiler))
-        depends_on("hdf5-vol-cache", when="%{} +hdf5 ^hdf5@1.14:".format(compiler))
-        depends_on("hdf5-vol-log", when="%{} +hdf5 ^hdf5@1.14:".format(compiler))
+    depends_on("hdf5-vol-async", when="+hdf5 ^hdf5@1.14:")
+    depends_on("hdf5-vol-cache", when="+hdf5 ^hdf5@1.14:")
+    depends_on("hdf5-vol-log", when="+hdf5 ^hdf5@1.14:")
 
     dav_sdk_depends_on("parallel-netcdf+shared", when="+pnetcdf", propagate=["fortran"])
 
