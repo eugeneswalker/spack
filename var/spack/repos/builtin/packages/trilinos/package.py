@@ -148,7 +148,7 @@ class Trilinos(CMakePackage, CudaPackage, ROCmPackage):
     variant("stratimikos", default=False, description="Compile with Stratimikos")
     variant("teko", default=False, description="Compile with Teko")
     variant("tempus", default=False, description="Compile with Tempus")
-    variant("testing", default=False, description="Enable testing")/
+    variant("testing", default=False, description="Enable testing")
     variant("thyra", default=False, description="Compile with Thyra")
     variant("tpetra", default=True, description="Compile with Tpetra")
     variant("trilinoscouplings", default=False, description="Compile with TrilinosCouplings")
@@ -359,7 +359,7 @@ class Trilinos(CMakePackage, CudaPackage, ROCmPackage):
     # Old trilinos fails with new CUDA (see #27180)
     conflicts("@:13.0.1 +cuda", when="^cuda@11:")
     # Build hangs with CUDA 11.6 (see #28439)
-    conflicts("+cuda +stokhos", when="^cuda@11.6:")
+    conflicts("+cuda +stokhos", when="^cuda@11.6:11.9")
     # Cuda UVM must be enabled prior to 13.2
     # See https://github.com/spack/spack/issues/28869
     conflicts("~uvm", when="@:13.1 +cuda")
@@ -383,19 +383,19 @@ class Trilinos(CMakePackage, CudaPackage, ROCmPackage):
     # ###################### Dependencies ##########################
 
     # External Kokkos
-    depends_on("kokkos@4.1.00", when="@14.4.0: +kokkos")
-    depends_on("kokkos +wrapper", when="trilinos@14.4.0: +kokkos +wrapper")
-    depends_on("kokkos ~wrapper", when="trilinos@14.4.0: +kokkos ~wrapper")
+    #depends_on("kokkos@4.1.00", when="@14.4.0: +kokkos")
+    #depends_on("kokkos +wrapper", when="trilinos@14.4.0: +kokkos +wrapper")
+    #depends_on("kokkos ~wrapper", when="trilinos@14.4.0: +kokkos ~wrapper")
 
-    for a in CudaPackage.cuda_arch_values:
-        arch_str = "+cuda cuda_arch=" + a
-        kokkos_spec = "kokkos@4.1.00 " + arch_str
-        depends_on(kokkos_spec, when="@14.4.0 +kokkos " + arch_str)
+    #for a in CudaPackage.cuda_arch_values:
+    #    arch_str = "+cuda cuda_arch=" + a
+    #    kokkos_spec = "kokkos@4.1.00 " + arch_str
+    #    depends_on(kokkos_spec, when="@14.4.0 +kokkos " + arch_str)
 
-    for a in ROCmPackage.amdgpu_targets:
-        arch_str = "+rocm amdgpu_target={0}".format(a)
-        kokkos_spec = "kokkos@4.1.00 {0}".format(arch_str)
-        depends_on(kokkos_spec, when="@14.4.0 +kokkos {0}".format(arch_str))
+    #for a in ROCmPackage.amdgpu_targets:
+    #    arch_str = "+rocm amdgpu_target={0}".format(a)
+    #    kokkos_spec = "kokkos@4.1.00 {0}".format(arch_str)
+    #    depends_on(kokkos_spec, when="@14.4.0 +kokkos {0}".format(arch_str))
 
     depends_on("adios2", when="+adios2")
     depends_on("blas")
@@ -818,8 +818,8 @@ class Trilinos(CMakePackage, CudaPackage, ROCmPackage):
             define_tpl(tpl_name, dep_name, dep_name in spec)
 
         # External Kokkos
-        if spec.satisfies("@14.4.0 +kokkos"):
-            options.append(define_tpl_enable("Kokkos"))
+        #if spec.satisfies("@14.4.0 +kokkos"):
+        #    options.append(define_tpl_enable("Kokkos"))
 
         # MPI settings
         options.append(define_tpl_enable("MPI"))
