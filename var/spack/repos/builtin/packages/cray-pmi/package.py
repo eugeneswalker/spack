@@ -14,6 +14,7 @@ class CrayPmi(Package):
 
     maintainers("haampie")
 
+    version("6.1.8")
     version("5.0.17")
     version("5.0.16")
     version("5.0.11")
