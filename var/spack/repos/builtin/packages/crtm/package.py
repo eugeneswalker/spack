@@ -53,6 +53,7 @@ class Crtm(CMakePackage):
     # add ecbuild dependency for next release with fix
     # depends_on("ecbuild", when="@2.4.0:", type=("build"))
 
+    version("v2.4.1-jedi", sha256="fd8bf4db4f2a3b420b4186de84483ba2a36660519dffcb1e0ff14bfe8c6f6a14")
     # REL-2.4.0_emc (v2.4.0 ecbuild does not work)
     version("2.4.0", commit="5ddd0d6b0138284764065feda73b5adf599082a2")
     # Uses the tip of REL-2.3.0_emc branch
