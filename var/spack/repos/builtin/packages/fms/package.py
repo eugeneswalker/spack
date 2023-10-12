@@ -16,7 +16,7 @@ class Fms(CMakePackage):
     url = "https://github.com/NOAA-GFDL/FMS/archive/refs/tags/2022.04.tar.gz"
     git = "https://github.com/NOAA-GFDL/FMS.git"
 
-    maintainers("AlexanderRichert-NOAA", "Hang-Lei-NOAA", "edwardhartnett", "rem1776")
+    maintainers("AlexanderRichert-NOAA", "Hang-Lei-NOAA", "edwardhartnett", "rem1776", "climbfuji")
 
     version("2023.02", sha256="dc029ffadfd82c334f104268bedd8635c77976485f202f0966ae4cf06d2374be")
     version(
@@ -43,6 +43,18 @@ class Fms(CMakePackage):
     version(
         "2020.04.01", sha256="2c409242de7dea0cf29f8dbf7495698b6bcac1eeb5c4599a728bdea172ffe37c"
     )
+
+    # DH* 20220602
+    # These versions were adapated by JCSDA and are only meant to be
+    # used temporarily, until the JCSDA changes have found their way
+    # back into the official repository.
+    # Commit corresponds to branch="release-stable" in the JCSDA public fork
+    version("release-jcsda", commit="1f739141ef8b000a0bd75ae8bebfadea340299ba")
+    # version("dev-jcsda", branch="dev/jcsda", no_cache=True)
+
+    with when("@release-jcsda"):
+        git = "https://github.com/JCSDA/fms.git"
+    # *DH 20220602
 
     variant(
         "precision",
@@ -87,6 +99,7 @@ class Fms(CMakePackage):
     depends_on("netcdf-c")
     depends_on("netcdf-fortran")
     depends_on("mpi")
+    depends_on("llvm-openmp", when="+openmp %apple-clang", type=("build", "run"))
     depends_on("libyaml", when="+yaml")
 
     def cmake_args(self):
@@ -105,5 +118,20 @@ class Fms(CMakePackage):
         args.append(self.define("CMAKE_C_COMPILER", self.spec["mpi"].mpicc))
         args.append(self.define("CMAKE_CXX_COMPILER", self.spec["mpi"].mpicxx))
         args.append(self.define("CMAKE_Fortran_COMPILER", self.spec["mpi"].mpifc))
+
+        fflags = []
+
+        if self.compiler.name in ["gcc", "clang", "apple-clang"]:
+            gfortran_major_version = int(
+                spack.compiler.get_compiler_version_output(self.compiler.fc, "-dumpversion").split(
+                    "."
+                )[0]
+            )
+
+            if gfortran_major_version >= 10:
+                fflags.append("-fallow-argument-mismatch")
+
+        if fflags:
+            args.append(self.define("CMAKE_Fortran_FLAGS", " ".join(fflags)))
 
         return args
