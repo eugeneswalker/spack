@@ -71,6 +71,7 @@ class Trilinos(CMakePackage, CudaPackage, ROCmPackage):
     # ###################### Variants ##########################
 
     # Build options
+    variant("sycl", default=False, description="Enable SYCL")
     variant("complex", default=False, description="Enable complex numbers in Trilinos")
     variant("cuda_rdc", default=False, description="Turn on RDC for CUDA build")
     variant("rocm_rdc", default=False, description="Turn on RDC for ROCm build")
@@ -246,6 +247,7 @@ class Trilinos(CMakePackage, CudaPackage, ROCmPackage):
     with when("~kokkos"):
         conflicts("+cuda")
         conflicts("+rocm")
+        conflicts("+sycl")
         conflicts("+tpetra")
         conflicts("+intrepid2")
         conflicts("+phalanx")
@@ -930,6 +932,9 @@ class Trilinos(CMakePackage, CudaPackage, ROCmPackage):
                     define_kok_enable("OPENMP" if spec.version >= Version("13") else "OpenMP"),
                 ]
             )
+            if spec.satisfies("+sycl"):
+                options.append(define_kok_enable("SYCL", True))
+
             if "+cuda" in spec:
                 use_uvm = "+uvm" in spec
                 options.extend(
