@@ -934,6 +934,7 @@ class Trilinos(CMakePackage, CudaPackage, ROCmPackage):
             )
             if spec.satisfies("+sycl"):
                 options.append(define_kok_enable("SYCL", True))
+                options.append("-DKokkos_ARCH_INTEL_XEHP=ON")
 
             if "+cuda" in spec:
                 use_uvm = "+uvm" in spec
