@@ -19,6 +19,7 @@ class Hive(Package):
 
     license("Apache-2.0")
 
+    version("4.0.0-beta-1", sha256="4114d8e9a523562c77237a8751dec9ed1bcbf6ccbe2e178d72f356ca4e65d466")
     version("3.1.2", sha256="d75dcf36908b4e7b9b0ec9aec57a46a6628b97b276c233cb2c2f1a3e89b13462")
     version("2.3.6", sha256="0b3736edc8d15f01ed649bfce7d74346c35fd57567411e9d0c3f48578f76610d")
     version("1.2.2", sha256="763b246a1a1ceeb815493d1e5e1d71836b0c5b9be1c4cd9c8d685565113771d1")
