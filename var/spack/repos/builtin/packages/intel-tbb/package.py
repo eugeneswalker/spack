@@ -310,6 +310,7 @@ class MakefileBuilder(spack.build_systems.makefile.MakefileBuilder, SetupEnviron
             cmake_args = (
                 "-DTBB_ROOT={0}".format(prefix),
                 "-DTBB_OS={0}".format(platform.system()),
+                "-DTBB_TEST=OFF",
                 "-P",
                 "tbb_config_generator.cmake",
             )
