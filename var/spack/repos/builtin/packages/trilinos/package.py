@@ -42,6 +42,7 @@ class Trilinos(CMakePackage, CudaPackage, ROCmPackage):
 
     version("master", branch="master")
     version("develop", branch="develop")
+    version("13.4.0.2023.02.28", commit="8b3e2e1db4c7e07db13225c73057230c4814706f")
     version("14.4.0", sha256="8e7d881cf6677aa062f7bfea8baa1e52e8956aa575d6a4f90f2b6f032632d4c6")
     version("14.2.0", sha256="c96606e5cd7fc9d25b9dc20719cd388658520d7cbbd2b4de77a118440d1e0ccb")
     version("14.0.0", sha256="054d2fabdf70fce0dfaeb20eed265bd7894045d3e00c3d1ddb72d1c77c339ca1")
