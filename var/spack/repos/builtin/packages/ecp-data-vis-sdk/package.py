@@ -152,12 +152,12 @@ class EcpDataVisSdk(BundlePackage, CudaPackage, ROCmPackage):
     # Fortran support with ascent is problematic on some Cray platforms so the
     # SDK is explicitly disabling it until the issues are resolved.
     dav_sdk_depends_on(
-        "ascent+mpi~fortran+python+shared+vtkh+dray~test",
+        "ascent+mpi+openmp+python+shared+vtkh+dray~test",
         when="+ascent",
-        propagate=["adios2", "cuda"] + cuda_arch_variants,
+        propagate=["adios2", "cuda", "fortran"] + cuda_arch_variants,
     )
-    depends_on("ascent+openmp", when="~rocm+ascent")
-    depends_on("ascent~openmp", when="+rocm+ascent")
+#    depends_on("ascent+openmp", when="~rocm+ascent")
+#    depends_on("ascent~openmp", when="+rocm+ascent")
 
     # Need to explicitly turn off conduit hdf5_compat in order to build
     # hdf5@1.12 which is required for SDK
@@ -181,15 +181,12 @@ class EcpDataVisSdk(BundlePackage, CudaPackage, ROCmPackage):
     dav_sdk_depends_on("visit+mpi+python+silo", when="+visit", propagate=["hdf5", "adios2"])
 
     dav_sdk_depends_on(
-        "vtk-m@1.7:+shared+mpi+rendering",
+        "vtk-m@1.8:+shared+mpi+rendering+examples",
         when="+vtkm",
         propagate=["cuda", "rocm"] + cuda_arch_variants + amdgpu_target_variants,
     )
-    # TODO: When Ascent is updated to use VTK-m >= 1.8 move examples to
-    # the main spec.
-    depends_on("vtk-m+examples", when="+vtkm ^vtk-m@1.8:")
-    depends_on("vtk-m+openmp", when="~rocm+vtkm")
-    depends_on("vtk-m~openmp", when="+rocm+vtkm")
+#    depends_on("vtk-m+openmp", when="~rocm+vtkm")
+#    depends_on("vtk-m~openmp", when="+rocm+vtkm")
 
     # +python is currently broken in sz
     # dav_sdk_depends_on('sz+shared+python+random_access',

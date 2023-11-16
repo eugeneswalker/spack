@@ -93,6 +93,9 @@ class Silo(AutotoolsPackage):
     # API changes in hdf5-1.13 cause breakage
     # See https://github.com/LLNL/Silo/pull/260
     patch("hdf5-113.patch", when="@4.11:4.11-bsd +hdf5 ^hdf5@1.13:")
+    # See https://github.com/LLNL/Silo/pull/307
+    patch("hdf5-114.patch", when="@4.11:4.11-bsd +hdf5 ^hdf5@1.13.2:")
+
     conflicts("^hdf5@1.13:", when="@:4.10.2-bsd")
 
     # hzip and fpzip are not available in the BSD releases
