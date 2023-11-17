@@ -153,6 +153,7 @@ class NaluWind(CMakePackage, CudaPackage, ROCmPackage):
             self.define_from_variant("ENABLE_PARAVIEW_CATALYST", "catalyst"),
             self.define_from_variant("ENABLE_FFTW", "fftw"),
             self.define_from_variant("ENABLE_UMPIRE", "umpire"),
+            self.define_from_variant("ENABLE_UNIT_TESTS", "unit-tests"),
         ]
 
         if "+openfast" in spec:
