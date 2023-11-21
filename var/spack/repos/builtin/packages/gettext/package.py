@@ -78,6 +78,11 @@ class Gettext(AutotoolsPackage, GNUMirrorPackage):
         match = re.match(r"gettext(?: \(.+\)) ([\d.]+)", output)
         return match.group(1) if match else None
 
+    def flag_handler(self, name, flags):
+        if name == "cflags":
+            flags.append("-Wno-error=incompatible-function-pointer-types")
+        return (flags, None, None)
+
     def configure_args(self):
         spec = self.spec
 
