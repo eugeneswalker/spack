@@ -206,7 +206,7 @@ class Mvapich2x(AutotoolsPackage):
 
     def setup_run_environment(self, env):
         if "pmi_version=pmi1" in self.spec:
-            env.set("SLURM_MPI_TYPE", "pmi1")
+            env.set("SLURM_MPI_TYPE", "pmi2")
         if "pmi_version=pmi2" in self.spec:
             env.set("SLURM_MPI_TYPE", "pmi2")
         if "pmi_version=pmix" in self.spec:
