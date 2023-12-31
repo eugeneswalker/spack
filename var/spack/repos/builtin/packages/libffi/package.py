@@ -41,7 +41,7 @@ class Libffi(AutotoolsPackage):
     def flag_handler(self, name, flags):
         if name == "cflags":
             if (
-                self.spec.satisfies("%oneapi@2023:")
+                self.spec.satisfies("%oneapi@2022:")
                 or self.spec.satisfies("%arm@23.04:")
                 or self.spec.satisfies("%clang@16:")
             ):
