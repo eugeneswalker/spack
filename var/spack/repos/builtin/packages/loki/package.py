@@ -20,7 +20,7 @@ class Loki(MakefilePackage):
 
     def flag_handler(self, name, flags):
         if name == "cxxflags":
-            if self.spec.satisfies("%oneapi@2023.0.0:"):
+            if self.spec.satisfies("%oneapi@2022:"):
                 flags.append("-Wno-error=dynamic-exception-spec")
             if self.spec.satisfies("@0.1.7 %gcc@11:"):
                 flags.append("-std=c++14")
