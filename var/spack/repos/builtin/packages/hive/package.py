@@ -15,7 +15,7 @@ class Hive(Package):
     """
 
     homepage = "https://hive.apache.org/"
-    url = "https://www.apache.org/dist/hive/hive-3.1.2/apache-hive-3.1.2-bin.tar.gz"
+    url = "https://downloads.apache.org/hive/hive-4.0.0-beta-1/apache-hive-4.0.0-beta-1-bin.tar.gz"
 
     license("Apache-2.0")
 
