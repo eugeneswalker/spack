@@ -148,6 +148,8 @@ class Mvapich2(AutotoolsPackage):
     # <https://lists.osu.edu/pipermail/mvapich-discuss/2023-January/010695.html>.
     patch("mpir_attr_delete_list_segfault.patch", when="@2.3.7")
 
+    patch("recv_pkt_null_buf.patch", when="@2.3.7")
+
     conflicts("fabrics=psm2", when="@:2.1")  # psm2 support was added at version 2.2
 
     patch("fix-torque.patch", when="@2.3.7-1")

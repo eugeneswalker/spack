@@ -1,0 +1,21 @@
+diff -ruN spack-src/src/mpid/ch3/src/ch3u_handle_recv_pkt.c spack-src-patched/src/mpid/ch3/src/ch3u_handle_recv_pkt.c
+--- spack-src/src/mpid/ch3/src/ch3u_handle_recv_pkt.c	2022-05-16 16:58:22.000000000 +0000
++++ spack-src-patched/src/mpid/ch3/src/ch3u_handle_recv_pkt.c	2024-03-04 22:25:41.425196023 +0000
+@@ -311,7 +311,7 @@
+ 
+         /* if all of the data has already been received, unpack it
+            now, otherwise build an iov and let the channel unpack */
+-        if (likely(*buflen >= data_sz))
++        if (likely(*buflen >= data_sz && buf != NULL))
+         {
+             MPIU_DBG_MSG(CH3_OTHER,VERBOSE,"Copying contiguous data to user buffer");
+             /* copy data out of the receive buffer */
+@@ -367,7 +367,7 @@
+         /* if all of the data has already been received, and the
+            message is not truncated, unpack it now, otherwise build an
+            iov and let the channel unpack */
+-        if (data_sz == rreq->dev.recv_data_sz && *buflen >= data_sz)
++        if (data_sz == rreq->dev.recv_data_sz && *buflen >= data_sz && buf != NULL)
+         {
+ #if defined(_ENABLE_CUDA_)
+             if (mv2_enable_device &&
