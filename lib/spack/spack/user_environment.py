@@ -17,6 +17,22 @@ from spack.context import Context
 #: Environment variable name Spack uses to track individually loaded packages
 spack_loaded_hashes_var = "SPACK_LOADED_HASHES"
 
+def root_prefix_inspections(platform):
+    """Get list of root prefix inspections for platform
+
+    Arguments:
+        platform (str): the name of the platform to consider. The platform
+            determines what environment variables Spack will use for some
+            inspections.
+
+    Returns:
+        A dictionary mapping subdirectory names to lists of environment
+            variables to modify with that directory if it exists.
+    """
+    inspections = spack.config.get("modules:root_prefix_inspections")
+    if isinstance(inspections, dict):
+        return inspections
+    return {}
 
 def prefix_inspections(platform):
     """Get list of prefix inspections for platform
@@ -105,6 +121,12 @@ def environment_modifications_for_specs(
         static = environment.inspect_path(
             s.prefix, prefix_inspections(s.platform), exclude=environment.is_system_path
         )
+
+        env.extend(static)
+
+    # Static environment changes (prefix inspetions) - roots only
+    for s in specs:
+        static = environment.inspect_path(s.prefix, root_prefix_inspections(s.platform), exclude=environment.is_system_path)
         env.extend(static)
 
     # Dynamic environment changes (setup_run_environment etc)

@@ -24,7 +24,7 @@ spec_regex = (
 )
 
 #: Matches a valid name for a module set
-valid_module_set_name = r"^(?!prefix_inspections$)\w[\w-]*$"
+valid_module_set_name = r"^(?!prefix_inspections|root_prefix_inspections$)\w[\w-]*$"
 
 #: Matches an anonymous spec, i.e. a spec without a root name
 anonymous_spec_regex = r"^[\^@%+~]"
@@ -139,6 +139,14 @@ module_config_properties = {
             r"^[\w-]*": array_of_strings
         },
     },
+    "root_prefix_inspections": {
+        "type": "object",
+        "additionalProperties": False,
+        "patternProperties": {
+            # prefix-relative path to be inspected for existence
+            r"^[\w-]*": array_of_strings
+        },
+    },
 }
 
 
@@ -148,6 +156,14 @@ properties: Dict[str, Any] = {
         "type": "object",
         "additionalProperties": False,
         "properties": {
+            "root_prefix_inspections": {
+                "type": "object",
+                "additionalProperties": False,
+                "patternProperties": {
+                    # prefix-relative path to be inspected for existence
+                    r"^[\w-]*": array_of_strings
+                },
+            },
             "prefix_inspections": {
                 "type": "object",
                 "additionalProperties": False,
