@@ -48,6 +48,7 @@ class Scotch(CMakePackage, MakefilePackage):
         "metis", default=False, description="Expose vendored METIS/ParMETIS libraries and wrappers"
     )
     variant("int64", default=False, description="Use int64_t for SCOTCH_Num typedef")
+    variant("noarch", default=False, description="Unset SPACK_TARGET_ARGS")
     variant(
         "link_error_lib",
         default=False,
@@ -127,6 +128,9 @@ class CMakeBuilder(spack.build_systems.cmake.CMakeBuilder):
 
         return args
 
+    @when("+noarch")
+    def setup_build_environment(self, env):
+        env.unset("SPACK_TARGET_ARGS")
 
 class MakefileBuilder(spack.build_systems.makefile.MakefileBuilder):
     build_directory = "src"
