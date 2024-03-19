@@ -46,6 +46,10 @@ class Fms(CMakePackage):
         "2020.04.01", sha256="2c409242de7dea0cf29f8dbf7495698b6bcac1eeb5c4599a728bdea172ffe37c"
     )
 
+    version("release-jcsda", commit="1f739141ef8b000a0bd75ae8bebfadea340299ba")
+    with when("@release-jcsda"):
+        git = "https://github.com/JCSDA/fms.git"
+
     variant(
         "precision",
         values=("32", "64"),
@@ -90,6 +94,9 @@ class Fms(CMakePackage):
     depends_on("netcdf-fortran")
     depends_on("mpi")
     depends_on("libyaml", when="+yaml")
+
+    depends_on("ecbuild", type=("build"), when="@release-jcsda")
+    depends_on("jedi-cmake", type=("build"), when="@release-jcsda")
 
     def cmake_args(self):
         args = [
