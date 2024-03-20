@@ -103,7 +103,13 @@
             "flags": "-march={name} -mtune=generic"
           }
         ],
-	"nvhpc": []
+	"nvhpc": [
+          {
+            "versions": ":",
+            "name": "px",
+            "flags": "-tp {name}"
+          }
+	]
       }
     },
     "x86_64_v2": {
