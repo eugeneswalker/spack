@@ -59,6 +59,7 @@ class Met(AutotoolsPackage):
     depends_on("py-pandas", when="+python", type=("build", "run"))
 
     patch("openmp_shape_patch.patch", when="@10.1.0")
+    patch("netcdf-cxx4-name.patch", when="@11.1.0")
 
     # https://github.com/JCSDA/spack-stack/issues/615
     # TODO(srherbener) Apple clang 14.x is getting pickier! When these updates are

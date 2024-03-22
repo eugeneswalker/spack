@@ -1,0 +1,561 @@
+diff -ruN spack-src/internal/test_util/basic/vx_util/Makefile.in spack-src-patched/internal/test_util/basic/vx_util/Makefile.in
+--- spack-src/internal/test_util/basic/vx_util/Makefile.in	2023-07-31 23:11:19.000000000 +0000
++++ spack-src-patched/internal/test_util/basic/vx_util/Makefile.in	2024-03-22 13:10:54.692901885 +0000
+@@ -405,7 +405,7 @@
+ 	-lvx_math \
+ 	-lvx_color \
+ 	-lvx_log \
+-	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas -lvx_util
++	-lm -lnetcdf-cxx4 -lnetcdf -lgsl -lgslcblas -lvx_util
+ 
+ all: all-am
+ 
+diff -ruN spack-src/internal/test_util/libcode/vx_data2d_factory/Makefile.in spack-src-patched/internal/test_util/libcode/vx_data2d_factory/Makefile.in
+--- spack-src/internal/test_util/libcode/vx_data2d_factory/Makefile.in	2023-07-31 23:11:19.000000000 +0000
++++ spack-src-patched/internal/test_util/libcode/vx_data2d_factory/Makefile.in	2024-03-22 13:10:54.696901909 +0000
+@@ -358,7 +358,7 @@
+ 	-lvx_math \
+ 	-lvx_color \
+ 	-lvx_log \
+-	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas
++	-lm -lnetcdf-cxx4 -lnetcdf -lgsl -lgslcblas
+ 
+ all: all-am
+ 
+diff -ruN spack-src/internal/test_util/libcode/vx_data2d_nccf/Makefile.in spack-src-patched/internal/test_util/libcode/vx_data2d_nccf/Makefile.in
+--- spack-src/internal/test_util/libcode/vx_data2d_nccf/Makefile.in	2023-07-31 23:11:19.000000000 +0000
++++ spack-src-patched/internal/test_util/libcode/vx_data2d_nccf/Makefile.in	2024-03-22 13:10:54.700901933 +0000
+@@ -329,7 +329,7 @@
+ 	-lvx_color \
+ 	-lvx_cal \
+ 	-lvx_log \
+-	-lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas
++	-lnetcdf-cxx4 -lnetcdf -lgsl -lgslcblas
+ 
+ all: all-am
+ 
+diff -ruN spack-src/internal/test_util/libcode/vx_data2d_nc_met/Makefile.in spack-src-patched/internal/test_util/libcode/vx_data2d_nc_met/Makefile.in
+--- spack-src/internal/test_util/libcode/vx_data2d_nc_met/Makefile.in	2023-07-31 23:11:19.000000000 +0000
++++ spack-src-patched/internal/test_util/libcode/vx_data2d_nc_met/Makefile.in	2024-03-22 13:10:54.696901909 +0000
+@@ -331,7 +331,7 @@
+ 	-lvx_color \
+ 	-lvx_cal \
+ 	-lvx_log \
+-	-lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas
++	-lnetcdf-cxx4 -lnetcdf -lgsl -lgslcblas
+ 
+ all: all-am
+ 
+diff -ruN spack-src/internal/test_util/libcode/vx_nc_util/Makefile.in spack-src-patched/internal/test_util/libcode/vx_nc_util/Makefile.in
+--- spack-src/internal/test_util/libcode/vx_nc_util/Makefile.in	2023-07-31 23:11:19.000000000 +0000
++++ spack-src-patched/internal/test_util/libcode/vx_nc_util/Makefile.in	2024-03-22 13:10:54.700901933 +0000
+@@ -351,7 +351,7 @@
+ 	-lvx_math \
+ 	-lvx_color \
+ 	-lvx_log \
+-	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas -lvx_util
++	-lm -lnetcdf-cxx4 -lnetcdf -lgsl -lgslcblas -lvx_util
+ 
+ all: all-am
+ 
+diff -ruN spack-src/internal/test_util/libcode/vx_series_data/Makefile.in spack-src-patched/internal/test_util/libcode/vx_series_data/Makefile.in
+--- spack-src/internal/test_util/libcode/vx_series_data/Makefile.in	2023-07-31 23:11:19.000000000 +0000
++++ spack-src-patched/internal/test_util/libcode/vx_series_data/Makefile.in	2024-03-22 13:10:54.692901885 +0000
+@@ -335,7 +335,7 @@
+ 	-lvx_log \
+ 	-lvx_cal \
+ 	-lvx_util \
+-	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas
++	-lm -lnetcdf-cxx4 -lnetcdf -lgsl -lgslcblas
+ 
+ all: all-am
+ 
+diff -ruN spack-src/internal/test_util/libcode/vx_tc_util/Makefile.in spack-src-patched/internal/test_util/libcode/vx_tc_util/Makefile.in
+--- spack-src/internal/test_util/libcode/vx_tc_util/Makefile.in	2023-07-31 23:11:19.000000000 +0000
++++ spack-src-patched/internal/test_util/libcode/vx_tc_util/Makefile.in	2024-03-22 13:10:54.692901885 +0000
+@@ -356,7 +356,7 @@
+ 	-lvx_math \
+ 	-lvx_color \
+ 	-lvx_log \
+-	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas -lvx_util
++	-lm -lnetcdf-cxx4 -lnetcdf -lgsl -lgslcblas -lvx_util
+ 
+ test_read_prob_SOURCES = test_read_prob.cc
+ test_read_prob_CPPFLAGS = ${MET_CPPFLAGS}
+@@ -392,7 +392,7 @@
+ 	-lvx_math \
+ 	-lvx_color \
+ 	-lvx_log \
+-	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas -lvx_util
++	-lm -lnetcdf-cxx4 -lnetcdf -lgsl -lgslcblas -lvx_util
+ 
+ all: all-am
+ 
+diff -ruN spack-src/internal/test_util/tools/other/mode_time_domain/Makefile.in spack-src-patched/internal/test_util/tools/other/mode_time_domain/Makefile.in
+--- spack-src/internal/test_util/tools/other/mode_time_domain/Makefile.in	2023-07-31 23:11:19.000000000 +0000
++++ spack-src-patched/internal/test_util/tools/other/mode_time_domain/Makefile.in	2024-03-22 13:10:54.700901933 +0000
+@@ -397,7 +397,7 @@
+ 	-lvx_math \
+ 	-lvx_color \
+ 	-lvx_log \
+-	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas -lz
++	-lm -lnetcdf-cxx4 -lnetcdf -lgsl -lgslcblas -lz
+ 
+ all: all-am
+ 
+diff -ruN spack-src/src/tools/core/ensemble_stat/Makefile.in spack-src-patched/src/tools/core/ensemble_stat/Makefile.in
+--- spack-src/src/tools/core/ensemble_stat/Makefile.in	2023-07-31 23:11:19.000000000 +0000
++++ spack-src-patched/src/tools/core/ensemble_stat/Makefile.in	2024-03-22 13:10:54.716902032 +0000
+@@ -350,7 +350,7 @@
+ 	-lvx_cal \
+ 	-lvx_log \
+ 	$(PYTHON_LIBS) \
+-	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas
++	-lm -lnetcdf-cxx4 -lnetcdf -lgsl -lgslcblas
+ 
+ EXTRA_DIST = ensemble_stat.h \
+ 	ensemble_stat_conf_info.h
+diff -ruN spack-src/src/tools/core/grid_stat/Makefile.in spack-src-patched/src/tools/core/grid_stat/Makefile.in
+--- spack-src/src/tools/core/grid_stat/Makefile.in	2023-07-31 23:11:19.000000000 +0000
++++ spack-src-patched/src/tools/core/grid_stat/Makefile.in	2024-03-22 13:10:54.716902032 +0000
+@@ -348,7 +348,7 @@
+ 	-lvx_math \
+ 	-lvx_color \
+ 	-lvx_log \
+-	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas
++	-lm -lnetcdf-cxx4 -lnetcdf -lgsl -lgslcblas
+ 
+ EXTRA_DIST = grid_stat.h \
+ 	grid_stat_conf_info.h
+diff -ruN spack-src/src/tools/core/mode/Makefile.in spack-src-patched/src/tools/core/mode/Makefile.in
+--- spack-src/src/tools/core/mode/Makefile.in	2023-07-31 23:11:19.000000000 +0000
++++ spack-src-patched/src/tools/core/mode/Makefile.in	2024-03-22 13:10:54.716902032 +0000
+@@ -385,7 +385,7 @@
+ 	-lvx_math \
+ 	-lvx_color \
+ 	-lvx_log \
+-	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas -lz
++	-lm -lnetcdf-cxx4 -lnetcdf -lgsl -lgslcblas -lz
+ 
+ EXTRA_DIST = mode_exec.h \
+ 	mode_ps_file.h \
+diff -ruN spack-src/src/tools/core/mode_analysis/Makefile.in spack-src-patched/src/tools/core/mode_analysis/Makefile.in
+--- spack-src/src/tools/core/mode_analysis/Makefile.in	2023-07-31 23:11:19.000000000 +0000
++++ spack-src-patched/src/tools/core/mode_analysis/Makefile.in	2024-03-22 13:10:54.716902032 +0000
+@@ -351,7 +351,7 @@
+ 	-lvx_math \
+ 	-lvx_color \
+ 	-lvx_log \
+-	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas -lvx_util
++	-lm -lnetcdf-cxx4 -lnetcdf -lgsl -lgslcblas -lvx_util
+ 
+ EXTRA_DIST = config_to_att.h
+ all: all-am
+diff -ruN spack-src/src/tools/core/pcp_combine/Makefile.in spack-src-patched/src/tools/core/pcp_combine/Makefile.in
+--- spack-src/src/tools/core/pcp_combine/Makefile.in	2023-07-31 23:11:19.000000000 +0000
++++ spack-src-patched/src/tools/core/pcp_combine/Makefile.in	2024-03-22 13:10:54.716902032 +0000
+@@ -338,7 +338,7 @@
+ 	-lvx_math \
+ 	-lvx_color \
+ 	-lvx_log \
+-	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas
++	-lm -lnetcdf-cxx4 -lnetcdf -lgsl -lgslcblas
+ 
+ all: all-am
+ 
+diff -ruN spack-src/src/tools/core/point_stat/Makefile.in spack-src-patched/src/tools/core/point_stat/Makefile.in
+--- spack-src/src/tools/core/point_stat/Makefile.in	2023-07-31 23:11:19.000000000 +0000
++++ spack-src-patched/src/tools/core/point_stat/Makefile.in	2024-03-22 13:10:54.716902032 +0000
+@@ -350,7 +350,7 @@
+ 	-lvx_cal \
+ 	-lvx_log \
+ 	$(PYTHON_LIBS) \
+-	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas
++	-lm -lnetcdf-cxx4 -lnetcdf -lgsl -lgslcblas
+ 
+ EXTRA_DIST = point_stat.h \
+ 	point_stat_conf_info.h
+diff -ruN spack-src/src/tools/core/series_analysis/Makefile.in spack-src-patched/src/tools/core/series_analysis/Makefile.in
+--- spack-src/src/tools/core/series_analysis/Makefile.in	2023-07-31 23:11:19.000000000 +0000
++++ spack-src-patched/src/tools/core/series_analysis/Makefile.in	2024-03-22 13:10:54.716902032 +0000
+@@ -350,7 +350,7 @@
+ 	-lvx_math \
+ 	-lvx_color \
+ 	-lvx_log \
+-	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas
++	-lm -lnetcdf-cxx4 -lnetcdf -lgsl -lgslcblas
+ 
+ EXTRA_DIST = series_analysis.h \
+ 	series_analysis_conf_info.h
+diff -ruN spack-src/src/tools/core/stat_analysis/Makefile.in spack-src-patched/src/tools/core/stat_analysis/Makefile.in
+--- spack-src/src/tools/core/stat_analysis/Makefile.in	2023-07-31 23:11:19.000000000 +0000
++++ spack-src-patched/src/tools/core/stat_analysis/Makefile.in	2024-03-22 13:10:54.716902032 +0000
+@@ -361,7 +361,7 @@
+ 	-lvx_color \
+ 	-lvx_log \
+ 	-lvx_summary \
+-	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas
++	-lm -lnetcdf-cxx4 -lnetcdf -lgsl -lgslcblas
+ 
+ EXTRA_DIST = stat_analysis.h \
+ 	parse_stat_line.h \
+diff -ruN spack-src/src/tools/core/wavelet_stat/Makefile.in spack-src-patched/src/tools/core/wavelet_stat/Makefile.in
+--- spack-src/src/tools/core/wavelet_stat/Makefile.in	2023-07-31 23:11:19.000000000 +0000
++++ spack-src-patched/src/tools/core/wavelet_stat/Makefile.in	2024-03-22 13:10:54.716902032 +0000
+@@ -355,7 +355,7 @@
+ 	-lvx_math \
+ 	-lvx_color \
+ 	-lvx_log \
+-	-lm -lz -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas
++	-lm -lz -lnetcdf-cxx4 -lnetcdf -lgsl -lgslcblas
+ 
+ EXTRA_DIST = wavelet_stat.h \
+ 	wavelet_stat_conf_info.h
+diff -ruN spack-src/src/tools/dev_utils/Makefile.in spack-src-patched/src/tools/dev_utils/Makefile.in
+--- spack-src/src/tools/dev_utils/Makefile.in	2023-07-31 23:11:19.000000000 +0000
++++ spack-src-patched/src/tools/dev_utils/Makefile.in	2024-03-22 13:10:54.720902056 +0000
+@@ -538,7 +538,7 @@
+ 	-lvx_util \
+ 	-lvx_cal \
+ 	-lvx_math \
+-	-lm -lnetcdf_c++4 -lnetcdf
++	-lm -lnetcdf-cxx4 -lnetcdf
+ 
+ swinging_door_SOURCES = swinging_door.cc \
+ 	met_nc_file.cc met_nc_file.h
+@@ -553,7 +553,7 @@
+ 	-lvx_math \
+ 	-lvx_log \
+ 	-lvx_util \
+-	-lm -lnetcdf_c++4 -lnetcdf
++	-lm -lnetcdf-cxx4 -lnetcdf
+ 
+ gen_climo_bin_SOURCES = gen_climo_bin.cc
+ gen_climo_bin_CPPFLAGS = ${MET_CPPFLAGS}
+@@ -583,7 +583,7 @@
+ 	-lvx_math \
+ 	-lvx_color \
+ 	-lvx_log \
+-	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas
++	-lm -lnetcdf-cxx4 -lnetcdf -lgsl -lgslcblas
+ 
+ all: all-recursive
+ 
+diff -ruN spack-src/src/tools/other/ascii2nc/Makefile.in spack-src-patched/src/tools/other/ascii2nc/Makefile.in
+--- spack-src/src/tools/other/ascii2nc/Makefile.in	2023-07-31 23:11:19.000000000 +0000
++++ spack-src-patched/src/tools/other/ascii2nc/Makefile.in	2024-03-22 13:10:54.720902056 +0000
+@@ -406,7 +406,7 @@
+ 	-lvx_math \
+ 	-lvx_log \
+ 	$(PYTHON_LIBS) \
+-	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas
++	-lm -lnetcdf-cxx4 -lnetcdf -lgsl -lgslcblas
+ 
+ all: all-am
+ 
+diff -ruN spack-src/src/tools/other/gen_ens_prod/Makefile.in spack-src-patched/src/tools/other/gen_ens_prod/Makefile.in
+--- spack-src/src/tools/other/gen_ens_prod/Makefile.in	2023-07-31 23:11:19.000000000 +0000
++++ spack-src-patched/src/tools/other/gen_ens_prod/Makefile.in	2024-03-22 13:10:54.724902081 +0000
+@@ -350,7 +350,7 @@
+ 	-lvx_cal \
+ 	-lvx_log \
+ 	$(PYTHON_LIBS) \
+-	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas
++	-lm -lnetcdf-cxx4 -lnetcdf -lgsl -lgslcblas
+ 
+ EXTRA_DIST = gen_ens_prod.h \
+ 	gen_ens_prod_conf_info.h
+diff -ruN spack-src/src/tools/other/gen_vx_mask/Makefile.in spack-src-patched/src/tools/other/gen_vx_mask/Makefile.in
+--- spack-src/src/tools/other/gen_vx_mask/Makefile.in	2023-07-31 23:11:19.000000000 +0000
++++ spack-src-patched/src/tools/other/gen_vx_mask/Makefile.in	2024-03-22 13:10:54.720902056 +0000
+@@ -353,7 +353,7 @@
+ 	-lvx_solar \
+ 	-lvx_cal \
+ 	-lvx_log \
+-	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas
++	-lm -lnetcdf-cxx4 -lnetcdf -lgsl -lgslcblas
+ 
+ EXTRA_DIST = gen_vx_mask.h
+ all: all-am
+diff -ruN spack-src/src/tools/other/grid_diag/Makefile.in spack-src-patched/src/tools/other/grid_diag/Makefile.in
+--- spack-src/src/tools/other/grid_diag/Makefile.in	2023-07-31 23:11:19.000000000 +0000
++++ spack-src-patched/src/tools/other/grid_diag/Makefile.in	2024-03-22 13:10:54.724902081 +0000
+@@ -347,7 +347,7 @@
+ 	-lvx_color \
+ 	-lvx_log \
+ 	-lvx_gsl_prob \
+-	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas
++	-lm -lnetcdf-cxx4 -lnetcdf -lgsl -lgslcblas
+ 
+ EXTRA_DIST = grid_diag.h \
+ 	grid_diag_conf_info.h
+diff -ruN spack-src/src/tools/other/gsi_tools/Makefile.in spack-src-patched/src/tools/other/gsi_tools/Makefile.in
+--- spack-src/src/tools/other/gsi_tools/Makefile.in	2023-07-31 23:11:19.000000000 +0000
++++ spack-src-patched/src/tools/other/gsi_tools/Makefile.in	2024-03-22 13:10:54.724902081 +0000
+@@ -401,7 +401,7 @@
+ 	-lvx_math \
+ 	-lvx_color \
+ 	-lvx_log \
+-	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas -lvx_util
++	-lm -lnetcdf-cxx4 -lnetcdf -lgsl -lgslcblas -lvx_util
+ 
+ gsidens2orank_SOURCES = gsidens2orank.h \
+ 	gsi_record.h \
+@@ -451,7 +451,7 @@
+ 	-lvx_math \
+ 	-lvx_color \
+ 	-lvx_log \
+-	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas -lvx_util
++	-lm -lnetcdf-cxx4 -lnetcdf -lgsl -lgslcblas -lvx_util
+ 
+ all: all-am
+ 
+diff -ruN spack-src/src/tools/other/ioda2nc/Makefile.in spack-src-patched/src/tools/other/ioda2nc/Makefile.in
+--- spack-src/src/tools/other/ioda2nc/Makefile.in	2023-07-31 23:11:19.000000000 +0000
++++ spack-src-patched/src/tools/other/ioda2nc/Makefile.in	2024-03-22 13:10:54.728902105 +0000
+@@ -362,7 +362,7 @@
+ 	-lvx_cal \
+ 	-lvx_log \
+ 	$(PYTHON_LIBS) \
+-	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas $(BLIB_NAME) \
++	-lm -lnetcdf-cxx4 -lnetcdf -lgsl -lgslcblas $(BLIB_NAME) \
+ 	$(FLIBS)
+ 
+ all: all-am
+diff -ruN spack-src/src/tools/other/lidar2nc/Makefile.in spack-src-patched/src/tools/other/lidar2nc/Makefile.in
+--- spack-src/src/tools/other/lidar2nc/Makefile.in	2023-07-31 23:11:19.000000000 +0000
++++ spack-src-patched/src/tools/other/lidar2nc/Makefile.in	2024-03-22 13:10:54.724902081 +0000
+@@ -375,7 +375,7 @@
+ 	$(PYTHON_LIBS) \
+ 	-lvx_summary \
+ 	-lmfhdf -ldf -ljpeg \
+-	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas -lz
++	-lm -lnetcdf-cxx4 -lnetcdf -lgsl -lgslcblas -lz
+ 
+ all: all-am
+ 
+diff -ruN spack-src/src/tools/other/madis2nc/Makefile.in spack-src-patched/src/tools/other/madis2nc/Makefile.in
+--- spack-src/src/tools/other/madis2nc/Makefile.in	2023-07-31 23:11:19.000000000 +0000
++++ spack-src-patched/src/tools/other/madis2nc/Makefile.in	2024-03-22 13:10:54.724902081 +0000
+@@ -348,7 +348,7 @@
+ 	-lvx_cal \
+ 	-lvx_log \
+ 	$(PYTHON_LIBS) \
+-	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas
++	-lm -lnetcdf-cxx4 -lnetcdf -lgsl -lgslcblas
+ 
+ EXTRA_DIST = madis2nc.h \
+ 	madis2nc_conf_info.h
+diff -ruN spack-src/src/tools/other/mode_graphics/Makefile.in spack-src-patched/src/tools/other/mode_graphics/Makefile.in
+--- spack-src/src/tools/other/mode_graphics/Makefile.in	2023-07-31 23:11:19.000000000 +0000
++++ spack-src-patched/src/tools/other/mode_graphics/Makefile.in	2024-03-22 13:10:54.728902105 +0000
+@@ -369,7 +369,7 @@
+ 	-lvx_config \
+ 	-lvx_cal \
+ 	-lvx_math \
+-	-lcairo -lfreetype -lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas -lz
++	-lcairo -lfreetype -lm -lnetcdf-cxx4 -lnetcdf -lgsl -lgslcblas -lz
+ 
+ all: all-am
+ 
+diff -ruN spack-src/src/tools/other/mode_time_domain/Makefile.in spack-src-patched/src/tools/other/mode_time_domain/Makefile.in
+--- spack-src/src/tools/other/mode_time_domain/Makefile.in	2023-07-31 23:11:19.000000000 +0000
++++ spack-src-patched/src/tools/other/mode_time_domain/Makefile.in	2024-03-22 13:10:54.728902105 +0000
+@@ -416,7 +416,7 @@
+ 	-lvx_math \
+ 	-lvx_color \
+ 	-lvx_log \
+-	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas -lz
++	-lm -lnetcdf-cxx4 -lnetcdf -lgsl -lgslcblas -lz
+ 
+ all: all-am
+ 
+diff -ruN spack-src/src/tools/other/modis_regrid/Makefile.in spack-src-patched/src/tools/other/modis_regrid/Makefile.in
+--- spack-src/src/tools/other/modis_regrid/Makefile.in	2023-07-31 23:11:19.000000000 +0000
++++ spack-src-patched/src/tools/other/modis_regrid/Makefile.in	2024-03-22 13:10:54.724902081 +0000
+@@ -366,7 +366,7 @@
+ 	-lvx_math \
+ 	-lvx_color \
+ 	-lvx_log \
+-	-lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas \
++	-lnetcdf-cxx4 -lnetcdf -lgsl -lgslcblas \
+ 	-lhdfeos \
+ 	-lmfhdf \
+ 	-ldf \
+diff -ruN spack-src/src/tools/other/pb2nc/Makefile.in spack-src-patched/src/tools/other/pb2nc/Makefile.in
+--- spack-src/src/tools/other/pb2nc/Makefile.in	2023-07-31 23:11:19.000000000 +0000
++++ spack-src-patched/src/tools/other/pb2nc/Makefile.in	2024-03-22 13:10:54.724902081 +0000
+@@ -390,7 +390,7 @@
+ 	-lvx_cal \
+ 	-lvx_log \
+ 	$(PYTHON_LIBS) \
+-	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas $(BLIB_NAME) \
++	-lm -lnetcdf-cxx4 -lnetcdf -lgsl -lgslcblas $(BLIB_NAME) \
+ 	$(FLIBS)
+ 
+ EXTRA_DIST = readpb.prm \
+diff -ruN spack-src/src/tools/other/plot_data_plane/Makefile.in spack-src-patched/src/tools/other/plot_data_plane/Makefile.in
+--- spack-src/src/tools/other/plot_data_plane/Makefile.in	2023-07-31 23:11:19.000000000 +0000
++++ spack-src-patched/src/tools/other/plot_data_plane/Makefile.in	2024-03-22 13:10:54.724902081 +0000
+@@ -347,7 +347,7 @@
+ 	-lvx_math \
+ 	-lvx_cal \
+ 	-lvx_log \
+-	-lm -lz -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas
++	-lm -lz -lnetcdf-cxx4 -lnetcdf -lgsl -lgslcblas
+ 
+ all: all-am
+ 
+diff -ruN spack-src/src/tools/other/plot_point_obs/Makefile.in spack-src-patched/src/tools/other/plot_point_obs/Makefile.in
+--- spack-src/src/tools/other/plot_point_obs/Makefile.in	2023-07-31 23:11:19.000000000 +0000
++++ spack-src-patched/src/tools/other/plot_point_obs/Makefile.in	2024-03-22 13:10:54.728902105 +0000
+@@ -354,7 +354,7 @@
+ 	-lvx_cal \
+ 	-lvx_log \
+ 	$(PYTHON_LIBS) \
+-	-lm -lz -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas
++	-lm -lz -lnetcdf-cxx4 -lnetcdf -lgsl -lgslcblas
+ 
+ EXTRA_DIST = plot_point_obs.h \
+ 	plot_point_obs_conf_info.h
+diff -ruN spack-src/src/tools/other/point2grid/Makefile.in spack-src-patched/src/tools/other/point2grid/Makefile.in
+--- spack-src/src/tools/other/point2grid/Makefile.in	2023-07-31 23:11:19.000000000 +0000
++++ spack-src-patched/src/tools/other/point2grid/Makefile.in	2024-03-22 13:10:54.724902081 +0000
+@@ -358,7 +358,7 @@
+ 	-lvx_cal \
+ 	-lvx_log \
+ 	$(PYTHON_LIBS) \
+-	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas
++	-lm -lnetcdf-cxx4 -lnetcdf -lgsl -lgslcblas
+ 
+ all: all-am
+ 
+diff -ruN spack-src/src/tools/other/regrid_data_plane/Makefile.in spack-src-patched/src/tools/other/regrid_data_plane/Makefile.in
+--- spack-src/src/tools/other/regrid_data_plane/Makefile.in	2023-07-31 23:11:19.000000000 +0000
++++ spack-src-patched/src/tools/other/regrid_data_plane/Makefile.in	2024-03-22 13:10:54.724902081 +0000
+@@ -343,7 +343,7 @@
+ 	-lvx_math \
+ 	-lvx_color \
+ 	-lvx_log \
+-	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas
++	-lm -lnetcdf-cxx4 -lnetcdf -lgsl -lgslcblas
+ 
+ all: all-am
+ 
+diff -ruN spack-src/src/tools/other/shift_data_plane/Makefile.in spack-src-patched/src/tools/other/shift_data_plane/Makefile.in
+--- spack-src/src/tools/other/shift_data_plane/Makefile.in	2023-07-31 23:11:19.000000000 +0000
++++ spack-src-patched/src/tools/other/shift_data_plane/Makefile.in	2024-03-22 13:10:54.720902056 +0000
+@@ -343,7 +343,7 @@
+ 	-lvx_math \
+ 	-lvx_color \
+ 	-lvx_log \
+-	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas
++	-lm -lnetcdf-cxx4 -lnetcdf -lgsl -lgslcblas
+ 
+ all: all-am
+ 
+diff -ruN spack-src/src/tools/other/wwmca_tool/Makefile.in spack-src-patched/src/tools/other/wwmca_tool/Makefile.in
+--- spack-src/src/tools/other/wwmca_tool/Makefile.in	2023-07-31 23:11:19.000000000 +0000
++++ spack-src-patched/src/tools/other/wwmca_tool/Makefile.in	2024-03-22 13:10:54.724902081 +0000
+@@ -422,7 +422,7 @@
+ 	-lvx_math \
+ 	-lvx_color \
+ 	-lvx_log \
+-	-lm -lz -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas
++	-lm -lz -lnetcdf-cxx4 -lnetcdf -lgsl -lgslcblas
+ 
+ wwmca_plot_SOURCES = gridhemisphere_to_string.cc gridhemisphere_to_string.h \
+ 	wwmca_plot.cc \
+@@ -468,7 +468,7 @@
+ 	-lvx_math \
+ 	-lvx_color \
+ 	-lvx_log \
+-	-lm -lz -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas
++	-lm -lz -lnetcdf-cxx4 -lnetcdf -lgsl -lgslcblas
+ 
+ all: all-am
+ 
+diff -ruN spack-src/src/tools/tc_utils/rmw_analysis/Makefile.in spack-src-patched/src/tools/tc_utils/rmw_analysis/Makefile.in
+--- spack-src/src/tools/tc_utils/rmw_analysis/Makefile.in	2023-07-31 23:11:19.000000000 +0000
++++ spack-src-patched/src/tools/tc_utils/rmw_analysis/Makefile.in	2024-03-22 13:10:54.720902056 +0000
+@@ -349,7 +349,7 @@
+ 	-lvx_math \
+ 	-lvx_color \
+ 	-lvx_log \
+-	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas \
++	-lm -lnetcdf-cxx4 -lnetcdf -lgsl -lgslcblas \
+ 	$(FLIBS)
+ 
+ EXTRA_DIST = rmw_analysis_conf_info.h \
+diff -ruN spack-src/src/tools/tc_utils/tc_diag/Makefile.in spack-src-patched/src/tools/tc_utils/tc_diag/Makefile.in
+--- spack-src/src/tools/tc_utils/tc_diag/Makefile.in	2023-07-31 23:11:19.000000000 +0000
++++ spack-src-patched/src/tools/tc_utils/tc_diag/Makefile.in	2024-03-22 13:10:54.720902056 +0000
+@@ -352,7 +352,7 @@
+ 	-lvx_math \
+ 	-lvx_color \
+ 	-lvx_log \
+-	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas \
++	-lm -lnetcdf-cxx4 -lnetcdf -lgsl -lgslcblas \
+ 	$(FLIBS)
+ 
+ EXTRA_DIST = tc_diag_conf_info.h \
+diff -ruN spack-src/src/tools/tc_utils/tc_dland/Makefile.in spack-src-patched/src/tools/tc_utils/tc_dland/Makefile.in
+--- spack-src/src/tools/tc_utils/tc_dland/Makefile.in	2023-07-31 23:11:19.000000000 +0000
++++ spack-src-patched/src/tools/tc_utils/tc_dland/Makefile.in	2024-03-22 13:10:54.720902056 +0000
+@@ -347,7 +347,7 @@
+ 	-lvx_gsl_prob \
+ 	-lvx_cal \
+ 	-lvx_math \
+-	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas \
++	-lm -lnetcdf-cxx4 -lnetcdf -lgsl -lgslcblas \
+ 	$(FLIBS)
+ 
+ all: all-am
+diff -ruN spack-src/src/tools/tc_utils/tc_gen/Makefile.in spack-src-patched/src/tools/tc_utils/tc_gen/Makefile.in
+--- spack-src/src/tools/tc_utils/tc_gen/Makefile.in	2023-07-31 23:11:19.000000000 +0000
++++ spack-src-patched/src/tools/tc_utils/tc_gen/Makefile.in	2024-03-22 13:10:54.720902056 +0000
+@@ -353,7 +353,7 @@
+ 	-lvx_math \
+ 	-lvx_color \
+ 	-lvx_log \
+-	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas \
++	-lm -lnetcdf-cxx4 -lnetcdf -lgsl -lgslcblas \
+ 	$(FLIBS)
+ 
+ EXTRA_DIST = tc_gen_conf_info.h \
+diff -ruN spack-src/src/tools/tc_utils/tc_pairs/Makefile.in spack-src-patched/src/tools/tc_utils/tc_pairs/Makefile.in
+--- spack-src/src/tools/tc_utils/tc_pairs/Makefile.in	2023-07-31 23:11:19.000000000 +0000
++++ spack-src-patched/src/tools/tc_utils/tc_pairs/Makefile.in	2024-03-22 13:10:54.720902056 +0000
+@@ -377,7 +377,7 @@
+ 	-lvx_math \
+ 	-lvx_color \
+ 	-lvx_log \
+-	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas \
++	-lm -lnetcdf-cxx4 -lnetcdf -lgsl -lgslcblas \
+ 	$(FLIBS)
+ 
+ EXTRA_DIST = tc_pairs_conf_info.h \
+diff -ruN spack-src/src/tools/tc_utils/tc_rmw/Makefile.in spack-src-patched/src/tools/tc_utils/tc_rmw/Makefile.in
+--- spack-src/src/tools/tc_utils/tc_rmw/Makefile.in	2023-07-31 23:11:19.000000000 +0000
++++ spack-src-patched/src/tools/tc_utils/tc_rmw/Makefile.in	2024-03-22 13:10:54.720902056 +0000
+@@ -352,7 +352,7 @@
+ 	-lvx_math \
+ 	-lvx_color \
+ 	-lvx_log \
+-	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas \
++	-lm -lnetcdf-cxx4 -lnetcdf -lgsl -lgslcblas \
+ 	$(FLIBS)
+ 
+ EXTRA_DIST = tc_rmw_conf_info.h \
+diff -ruN spack-src/src/tools/tc_utils/tc_stat/Makefile.in spack-src-patched/src/tools/tc_utils/tc_stat/Makefile.in
+--- spack-src/src/tools/tc_utils/tc_stat/Makefile.in	2023-07-31 23:11:19.000000000 +0000
++++ spack-src-patched/src/tools/tc_utils/tc_stat/Makefile.in	2024-03-22 13:10:54.720902056 +0000
+@@ -357,7 +357,7 @@
+ 	-lvx_math \
+ 	-lvx_color \
+ 	-lvx_log \
+-	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas
++	-lm -lnetcdf-cxx4 -lnetcdf -lgsl -lgslcblas
+ 
+ EXTRA_DIST = tc_stat_conf_info.h \
+ 	tc_stat_files.h \
