@@ -371,7 +371,7 @@ class Trilinos(CMakePackage, CudaPackage, ROCmPackage):
     # Old trilinos fails with new CUDA (see #27180)
     conflicts("@:13.0.1 +cuda", when="^cuda@11:")
     # Build hangs with CUDA 11.6 (see #28439)
-    conflicts("+cuda +stokhos", when="^cuda@11.6:")
+    # conflicts("+cuda +stokhos", when="^cuda@11.6:")
     # superlu-dist defines a macro EMPTY which conflicts with a header in cuda
     # used when building stokhos
     # Fix: https://github.com/xiaoyeli/superlu_dist/commit/09cb1430f7be288fd4d75b8ed461aa0b7e68fefe
