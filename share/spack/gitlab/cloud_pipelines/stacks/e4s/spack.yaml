@@ -204,6 +204,7 @@ spack:
   - py-seaborn
   - py-tensorflow
   - py-torch
+  - py-deephyper
 
   # CUDA NOARCH
   - bricks +cuda
