@@ -652,6 +652,8 @@ class Trilinos(CMakePackage, CudaPackage, ROCmPackage):
         if "+test" in spec:
             options.append(define_trilinos_enable("TESTS", True))
             options.append(define("BUILD_TESTING", True))
+            options.append("-DROL_ENABLE_TESTS=OFF")
+            options.append("-DROL_ENABLE_EXAMPLES=OFF")
         else:
             options.append(define_trilinos_enable("TESTS", False))
 
