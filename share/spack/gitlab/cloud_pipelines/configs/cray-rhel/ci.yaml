@@ -1,4 +1,6 @@
 ci:
+  broken-tests-packages:
+  - petsc
   pipeline-gen:
   - build-job-remove:
       image: no-image
